@@ -1,0 +1,24 @@
+{
+  "name": "eduguide",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/http-snehal/Eduguide.git"
+  },
+  "author": "Team Shamayak",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/http-snehal/Eduguide/issues"
+  },
+  "homepage": "https://github.com/http-snehal/Eduguide#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
