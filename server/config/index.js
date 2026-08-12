@@ -30,7 +30,7 @@ const config = {
   // CORS
   corsOrigins: process.env.CORS_ORIGINS
     ? process.env.CORS_ORIGINS.split(',')
-    : ['http://localhost:5173'], // Vite default port
+    : ['http://localhost:5173', 'http://localhost:5174'], // Vite default ports
 };
 
 // Validate critical config at startup
