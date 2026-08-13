@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect, useMemo } from 'react';
 import { api } from '../../api/client';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from 'recharts';
+import ConsentModal from '../../components/ConsentModal';
 import '../../App.css'; 
 
 export default function StudentDashboard() {
@@ -11,11 +12,15 @@ export default function StudentDashboard() {
   const [history, setHistory] = useState([]);
   const [insights, setInsights] = useState(null);
   const [careerInterest, setCareerInterest] = useState(null);
+  const [needsConsent, setNeedsConsent] = useState(false);
 
   useEffect(() => {
-    fetchHistory();
-    fetchInsights();
-    if (user?.student_id) {
+    if (user) {
+      if (!user.consent_flag) {
+        setNeedsConsent(true);
+      }
+      fetchHistory();
+      fetchInsights();
       fetchCareerInterest(user.student_id);
     }
   }, [user]);
@@ -82,6 +87,15 @@ export default function StudentDashboard() {
 
   return (
     <div className="app-container">
+      {needsConsent && (
+        <ConsentModal 
+          studentId={user.student_id} 
+          onConsentGranted={() => {
+            setNeedsConsent(false);
+            // Optional: You could update local storage context here to reflect the change
+          }} 
+        />
+      )}
       <header className="header" style={{ justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <GraduationCap size={40} className="icon-logo" />

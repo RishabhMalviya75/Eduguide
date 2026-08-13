@@ -2,6 +2,7 @@ const { ApiError } = require('../middleware/errorHandler');
 const PISession = require('../models/PISession');
 const CareerInterestResult = require('../models/CareerInterestResult');
 const Student = require('../models/Student');
+const AuditLog = require('../models/AuditLog');
 
 /**
  * Log a new PI Session.
@@ -45,6 +46,20 @@ exports.createPISession = async (req, res, next) => {
       mapped_from: 'pi_session',
       source_id: piSession._id,
       suggestions,
+    }], { bypassScope: true });
+
+    // 3. Create AuditLog entry
+    await AuditLog.create([{
+      school_id: schoolId,
+      entity: 'Student',
+      entity_id: student_id,
+      action: 'pi_session_logged',
+      actor_id: counselorId,
+      meta: {
+        pi_session_id: piSession._id,
+        career_interest_id: newResult[0]._id,
+        suggestions
+      }
     }], { bypassScope: true });
 
     res.status(201).json({

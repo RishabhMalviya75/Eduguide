@@ -162,6 +162,29 @@ async function resetStudentPin(req, res) {
   });
 }
 
+/**
+ * Grant consent for a student.
+ * PUT /api/students/:id/consent
+ * Access: Student (themselves)
+ */
+async function grantConsent(req, res) {
+  const student = await Student.findByIdAndUpdate(
+    req.params.id,
+    { consent_flag: true },
+    { new: true, schoolId: req.schoolId }
+  );
+
+  if (!student) {
+    throw new ApiError(404, 'Student not found.');
+  }
+
+  res.json({
+    success: true,
+    message: 'Consent granted successfully.',
+    data: student,
+  });
+}
+
 module.exports = {
   createStudent,
   createStudentsBatch,
@@ -169,4 +192,5 @@ module.exports = {
   getStudentById,
   updateStudent,
   resetStudentPin,
+  grantConsent,
 };

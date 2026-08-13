@@ -8,6 +8,7 @@ const {
   getStudentById,
   updateStudent,
   resetStudentPin,
+  grantConsent,
 } = require('../controllers/studentController');
 
 const router = Router();
@@ -28,5 +29,8 @@ router.get('/:id', requireRole(['Admin', 'Teacher', 'Counselor', 'Student']), re
 // Admin-only: update student and reset PIN
 router.put('/:id', requireRole(['Admin']), updateStudent);
 router.put('/:id/reset-pin', requireRole(['Admin']), resetStudentPin);
+
+// Student: grant consent
+router.put('/:id/consent', requireRole(['Student']), requireSelf('id'), grantConsent);
 
 module.exports = router;

@@ -1,6 +1,7 @@
 const { ApiError } = require('../middleware/errorHandler');
 const Question = require('../models/Question');
 const TestSession = require('../models/TestSession');
+const AuditLog = require('../models/AuditLog');
 const { scoreTestSession } = require('../services/aiScoringService');
 
 /**
@@ -67,6 +68,16 @@ exports.startTest = async (req, res, next) => {
       })
       .setOptions({ schoolId });
 
+    // Capture starting IP
+    const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+    populatedSession.integrity_flags = {
+      ip_log: [clientIp],
+      focus_loss_count: 0,
+      auto_flagged: false,
+      flag_reasons: []
+    };
+    await populatedSession.save();
+
     res.status(201).json({
       success: true,
       message: 'New test session started.',
@@ -82,16 +93,17 @@ exports.startTest = async (req, res, next) => {
  */
 exports.submitTest = async (req, res, next) => {
   try {
-    const { sessionId, responses } = req.body;
+    const { session_id, sessionId, responses, proctoring_signals } = req.body;
+    const finalSessionId = session_id || sessionId;
     const schoolId = req.schoolId;
 
-    if (!sessionId || !responses) {
+    if (!finalSessionId || !responses) {
       throw new ApiError(400, 'Session ID and responses are required.');
     }
 
     // 1. Find the active session
     const session = await TestSession.findOne({
-      _id: sessionId,
+      _id: finalSessionId,
       student_id: req.user.student_id,
       status: 'in_progress'
     })
@@ -103,6 +115,26 @@ exports.submitTest = async (req, res, next) => {
 
     if (!session) {
       throw new ApiError(404, 'Active test session not found or already completed.');
+    }
+
+    // Proctoring Evaluation
+    const submitIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+    const startIp = session.integrity_flags.ip_log[0];
+    
+    if (submitIp !== startIp && submitIp !== 'unknown') {
+      session.integrity_flags.ip_log.push(submitIp);
+      session.integrity_flags.auto_flagged = true;
+      session.integrity_flags.flag_reasons.push('ip_mismatch');
+    }
+
+    if (proctoring_signals) {
+      const focusLoss = proctoring_signals.focus_loss_count || 0;
+      session.integrity_flags.focus_loss_count = focusLoss;
+      
+      if (focusLoss > 3) {
+        session.integrity_flags.auto_flagged = true;
+        session.integrity_flags.flag_reasons.push('excessive_focus_loss');
+      }
     }
 
     // 2. Save responses and mark as completed
@@ -132,6 +164,21 @@ exports.submitTest = async (req, res, next) => {
 
     session.score = finalScore;
     await session.save();
+
+    // Audit Logging for auto-flagged attempts
+    if (session.integrity_flags.auto_flagged) {
+      await AuditLog.create([{
+        school_id: schoolId,
+        entity: 'TestSession',
+        entity_id: session._id,
+        action: 'proctoring_auto_flag',
+        actor_id: req.user.student_id, // System/Student
+        meta: {
+          flag_reasons: session.integrity_flags.flag_reasons,
+          focus_loss_count: session.integrity_flags.focus_loss_count,
+        }
+      }], { bypassScope: true });
+    }
 
     res.status(200).json({
       success: true,
