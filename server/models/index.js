@@ -9,6 +9,7 @@ const AuditLog = require('./AuditLog');
 const Score = require('./Score');
 const PISession = require('./PISession');
 const CareerInterestResult = require('./CareerInterestResult');
+const Mark = require('./Mark');
 
 module.exports = {
   School,
@@ -22,4 +23,5 @@ module.exports = {
   Score,
   PISession,
   CareerInterestResult,
+  Mark,
 };

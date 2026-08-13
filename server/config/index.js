@@ -21,7 +21,7 @@ const config = {
   // Rate limiting
   authRateLimit: {
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 10, // 10 attempts per window
+    max: 100, // 100 attempts per window for development (change back to 10 for production)
   },
 
   // Bcrypt

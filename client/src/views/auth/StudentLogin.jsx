@@ -151,7 +151,6 @@ export default function StudentLogin() {
                     placeholder="••••"
                     value={pin}
                     onChange={(e) => setPin(e.target.value)}
-                    disabled={dob !== ''}
                   />
                 </div>
                 
@@ -162,7 +161,6 @@ export default function StudentLogin() {
                     className="form-input" 
                     value={dob}
                     onChange={(e) => setDob(e.target.value)}
-                    disabled={pin !== ''}
                   />
                 </div>
               </div>

@@ -21,7 +21,7 @@ export default function StudentDashboard() {
       }
       fetchHistory();
       fetchInsights();
-      fetchCareerInterest(user.student_id);
+      fetchCareerInterest(user.id);
     }
   }, [user]);
 
@@ -89,7 +89,7 @@ export default function StudentDashboard() {
     <div className="app-container">
       {needsConsent && (
         <ConsentModal 
-          studentId={user.student_id} 
+          studentId={user.id} 
           onConsentGranted={() => {
             setNeedsConsent(false);
             // Optional: You could update local storage context here to reflect the change
@@ -107,9 +107,14 @@ export default function StudentDashboard() {
           </div>
         </div>
         
-        <button onClick={logout} className="btn-primary" style={{ background: 'var(--slate-800)' }}>
-          <LogOut size={18} /> Logout
-        </button>
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <Link to={`/student/report/${user.id}`} className="btn-secondary">
+            View Full Report
+          </Link>
+          <button onClick={logout} className="btn-primary" style={{ background: 'var(--slate-800)' }}>
+            <LogOut size={18} /> Logout
+          </button>
+        </div>
       </header>
 
       <main className="bento-grid">

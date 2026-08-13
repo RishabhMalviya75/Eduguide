@@ -10,6 +10,7 @@ import AdminDashboard from './views/admin/AdminDashboard';
 import TeacherDashboard from './views/teacher/TeacherDashboard';
 import MarksUpload from './views/teacher/MarksUpload';
 import StudentDashboard from './views/student/StudentDashboard';
+import StudentReport from './views/student/StudentReport';
 import AptitudeTest from './views/student/AptitudeTest';
 import ReviewQueue from './views/staff/ReviewQueue';
 import CounselorDashboard from './views/counselor/CounselorDashboard';
@@ -81,6 +82,14 @@ export default function AppRoutes() {
         element={
           <ProtectedRoute allowedRoles={['Student']}>
             <StudentDashboard />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/student/report/:id" 
+        element={
+          <ProtectedRoute allowedRoles={['Student', 'Admin', 'Teacher', 'Counselor']}>
+            <StudentReport />
           </ProtectedRoute>
         } 
       />

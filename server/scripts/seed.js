@@ -138,6 +138,41 @@ async function seed() {
   const allStudents = await Student.find({}).setOptions({ bypassScope: true });
   console.log(`   ✅ Bypassed query returned ${allStudents.length} students (expected: 5)`);
 
+  // --- 6. Create Career Profiles (Sprint 5 Seed Data) ---
+  console.log('\n   Creating Career Profiles...');
+  const { CareerProfile } = require('../models');
+  if (!config.isProduction) {
+    await CareerProfile.deleteMany({}).setOptions({ bypassScope: true });
+  }
+
+  const careers = [
+    {
+      title: 'Engineering & Technology',
+      description: 'Design, build, and maintain software, hardware, and infrastructure.',
+      requirements: { 'Mathematics': 0.8, 'Science': 0.7, 'Logic': 0.9, 'Spatial': 0.6 }
+    },
+    {
+      title: 'Medical & Healthcare',
+      description: 'Treat patients, conduct medical research, and promote public health.',
+      requirements: { 'Science': 0.9, 'Mathematics': 0.5, 'Verbal': 0.7, 'Logic': 0.6 }
+    },
+    {
+      title: 'Arts & Humanities',
+      description: 'Express creativity through design, writing, fine arts, and media.',
+      requirements: { 'Verbal': 0.9, 'Spatial': 0.8, 'Logic': 0.4, 'Science': 0.2 }
+    }
+  ];
+
+  for (const c of careers) {
+    const profile = await CareerProfile.create([{
+      school_id: school._id,
+      title: c.title,
+      description: c.description,
+      requirements: c.requirements
+    }], { bypassScope: true });
+    console.log(`   ✅ Career Profile: ${profile[0].title}`);
+  }
+
   // --- Summary ---
   console.log('\n' + '='.repeat(50));
   console.log('🎉 Seed completed successfully!');
