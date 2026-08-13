@@ -12,6 +12,7 @@ const userRoutes = require('./routes/userRoutes');
 const studentRoutes = require('./routes/studentRoutes');
 const marksRoutes = require('./routes/marksRoutes');
 const testRoutes = require('./routes/testRoutes');
+const analyticsRoutes = require('./routes/analyticsRoutes');
 
 const app = express();
 
@@ -52,6 +53,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/marks', marksRoutes);
 app.use('/api/tests', testRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // --- Error Handling ---
 app.use(notFound);

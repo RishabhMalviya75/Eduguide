@@ -1,5 +1,5 @@
 import { useAuth } from '../../context/AuthContext';
-import { LogOut, GraduationCap, BrainCircuit, Target, ArrowRight } from 'lucide-react';
+import { LogOut, GraduationCap, BrainCircuit, Target, ArrowRight, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { api } from '../../api/client';
@@ -8,9 +8,11 @@ import '../../App.css';
 export default function StudentDashboard() {
   const { user, logout } = useAuth();
   const [history, setHistory] = useState([]);
+  const [insights, setInsights] = useState(null);
 
   useEffect(() => {
     fetchHistory();
+    fetchInsights();
   }, []);
 
   const fetchHistory = async () => {
@@ -21,6 +23,17 @@ export default function StudentDashboard() {
       }
     } catch (err) {
       console.error('Failed to fetch test history', err);
+    }
+  };
+
+  const fetchInsights = async () => {
+    try {
+      const res = await api.get('/analytics/student/insights');
+      if (res.success) {
+        setInsights(res.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch insights', err);
     }
   };
 
@@ -43,6 +56,40 @@ export default function StudentDashboard() {
       </header>
 
       <main className="bento-grid">
+        {/* Analytics & Recommendations Card */}
+        <div className="bento-card span-4-col" style={{ background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)' }}>
+          <div className="card-header">
+            <div className="card-icon" style={{ background: 'var(--sky-500)', color: 'white' }}><Zap size={24} /></div>
+            <h2 className="card-title">Career AI Matches</h2>
+          </div>
+          <div className="card-content">
+            {insights && insights.matches && insights.matches.length > 0 ? (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
+                {insights.matches.map((match, idx) => (
+                  <div key={match.careerId} style={{ background: 'white', padding: '1.5rem', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+                      <h3 style={{ fontSize: '1.1rem', color: 'var(--slate-800)', margin: 0 }}>{match.title}</h3>
+                      <span style={{ 
+                        background: idx === 0 ? 'var(--sky-100)' : 'var(--slate-100)', 
+                        color: idx === 0 ? 'var(--sky-700)' : 'var(--slate-600)', 
+                        padding: '0.25rem 0.5rem', 
+                        borderRadius: '20px', 
+                        fontSize: '0.85rem', 
+                        fontWeight: 'bold' 
+                      }}>
+                        {match.matchPercentage}% Match
+                      </span>
+                    </div>
+                    <p style={{ fontSize: '0.9rem', color: 'var(--slate-500)', lineHeight: 1.4 }}>{match.description}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p style={{ color: 'var(--slate-600)' }}>Take the aptitude test and ensure your marks are uploaded to see your career matches!</p>
+            )}
+          </div>
+        </div>
+
         <div className="bento-card span-2-col">
           <div className="card-header">
             <div className="card-icon"><Target size={24} /></div>
