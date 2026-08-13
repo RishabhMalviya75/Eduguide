@@ -11,6 +11,8 @@ import TeacherDashboard from './views/teacher/TeacherDashboard';
 import MarksUpload from './views/teacher/MarksUpload';
 import StudentDashboard from './views/student/StudentDashboard';
 import AptitudeTest from './views/student/AptitudeTest';
+import ReviewQueue from './views/staff/ReviewQueue';
+import CounselorDashboard from './views/counselor/CounselorDashboard';
 
 export default function AppRoutes() {
   const { user } = useAuth();
@@ -19,10 +21,9 @@ export default function AppRoutes() {
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={
-        // If already logged in, redirect to respective dashboard
         user ? (
           user.role === 'Admin' ? <Navigate to="/admin" /> :
-          user.role === 'Teacher' ? <Navigate to="/teacher" /> :
+          (user.role === 'Teacher' || user.role === 'Counselor') ? <Navigate to="/teacher" /> :
           <Navigate to="/student" />
         ) : <RoleSelection />
       } />
@@ -39,12 +40,28 @@ export default function AppRoutes() {
           </ProtectedRoute>
         } 
       />
+      <Route 
+        path="/staff/review-queue" 
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'Teacher', 'Counselor']}>
+            <ReviewQueue />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/counselor" 
+        element={
+          <ProtectedRoute allowedRoles={['Counselor', 'Teacher', 'Admin']}>
+            <CounselorDashboard />
+          </ProtectedRoute>
+        } 
+      />
 
-      {/* Protected Teacher Routes */}
+      {/* Protected Teacher/Staff Routes */}
       <Route 
         path="/teacher" 
         element={
-          <ProtectedRoute allowedRoles={['Teacher']}>
+          <ProtectedRoute allowedRoles={['Teacher', 'Counselor', 'Admin']}>
             <TeacherDashboard />
           </ProtectedRoute>
         } 
@@ -52,7 +69,7 @@ export default function AppRoutes() {
       <Route 
         path="/teacher/upload" 
         element={
-          <ProtectedRoute allowedRoles={['Teacher']}>
+          <ProtectedRoute allowedRoles={['Teacher', 'Counselor', 'Admin']}>
             <MarksUpload />
           </ProtectedRoute>
         } 

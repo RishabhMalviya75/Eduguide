@@ -10,12 +10,27 @@ export default function AptitudeTest() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [focusLossCount, setFocusLossCount] = useState(0);
   
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [responses, setResponses] = useState({}); // { question_id: option_index }
   const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 minutes in seconds
 
   const timerRef = useRef(null);
+
+  // Focus loss tracking
+  useEffect(() => {
+    const handleBlur = () => {
+      // Only track if test is active
+      if (session && !session.completed_at) {
+        setFocusLossCount(prev => prev + 1);
+        console.warn('Proctoring: Focus lost!');
+      }
+    };
+
+    window.addEventListener('blur', handleBlur);
+    return () => window.removeEventListener('blur', handleBlur);
+  }, [session]);
 
   useEffect(() => {
     startTest();
@@ -75,8 +90,11 @@ export default function AptitudeTest() {
 
     try {
       const res = await api.post('/tests/submit', {
-        sessionId: session._id,
-        responses: currentResponses
+        session_id: session._id,
+        responses: currentResponses,
+        proctoring_signals: {
+          focus_loss_count: focusLossCount
+        }
       });
       if (res.success) {
         navigate('/student');
@@ -164,32 +182,51 @@ export default function AptitudeTest() {
           </h2>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {currentQuestion.options.map((opt, idx) => {
-              const isSelected = responses[currentQuestion._id] === idx;
-              return (
-                <button
-                  key={idx}
-                  onClick={() => handleOptionSelect(currentQuestion._id, idx)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '1.25rem 1.5rem',
-                    border: `2px solid ${isSelected ? 'var(--sky-400)' : 'var(--slate-200)'}`,
-                    borderRadius: 'var(--radius-lg)',
-                    background: isSelected ? 'var(--sky-50)' : 'white',
-                    color: isSelected ? 'var(--sky-900)' : 'var(--slate-700)',
-                    fontSize: '1.1rem',
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                  }}
-                >
-                  <span>{opt}</span>
-                  {isSelected && <CheckCircle size={20} color="var(--sky-500)" />}
-                </button>
-              );
-            })}
+            {currentQuestion.format === 'MCQ' ? (
+              currentQuestion.options.map((opt, idx) => {
+                const isSelected = responses[currentQuestion._id] === idx;
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => handleOptionSelect(currentQuestion._id, idx)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '1.25rem 1.5rem',
+                      border: `2px solid ${isSelected ? 'var(--sky-400)' : 'var(--slate-200)'}`,
+                      borderRadius: 'var(--radius-lg)',
+                      background: isSelected ? 'var(--sky-50)' : 'white',
+                      color: isSelected ? 'var(--sky-900)' : 'var(--slate-700)',
+                      fontSize: '1.1rem',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    <span>{opt}</span>
+                    {isSelected && <CheckCircle size={20} color="var(--sky-500)" />}
+                  </button>
+                );
+              })
+            ) : (
+              <textarea
+                value={responses[currentQuestion._id] || ''}
+                onChange={(e) => handleOptionSelect(currentQuestion._id, e.target.value)}
+                placeholder="Type your answer here..."
+                rows={currentQuestion.format === 'essay' ? 8 : 4}
+                style={{
+                  width: '100%',
+                  padding: '1rem',
+                  border: '2px solid var(--slate-200)',
+                  borderRadius: 'var(--radius-lg)',
+                  fontSize: '1.1rem',
+                  color: 'var(--slate-800)',
+                  fontFamily: 'inherit',
+                  resize: 'vertical'
+                }}
+              />
+            )}
           </div>
         </main>
 

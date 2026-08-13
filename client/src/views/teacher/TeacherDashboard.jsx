@@ -1,5 +1,5 @@
 import { useAuth } from '../../context/AuthContext';
-import { LogOut, Presentation, Users, BookCheck, ArrowRight } from 'lucide-react';
+import { LogOut, Presentation, Users, BookCheck, ArrowRight, Target, ClipboardList } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import '../../App.css'; 
 
@@ -12,8 +12,8 @@ export default function TeacherDashboard() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <Presentation size={40} className="icon-logo" />
           <div>
-            <h1>Teacher Dashboard</h1>
-            <p style={{ color: 'var(--slate-500)' }}>Welcome back, {user?.name}</p>
+            <h1>Staff Dashboard</h1>
+            <p style={{ color: 'var(--slate-500)' }}>Welcome back, {user?.name} ({user?.role})</p>
           </div>
         </div>
         
@@ -48,9 +48,35 @@ export default function TeacherDashboard() {
             <h2 className="card-title">Marks Upload Pipeline</h2>
           </div>
           <div className="card-content">
-            <p style={{ marginBottom: '1rem' }}>Upload marks for your assigned classes (Sprint 3 feature).</p>
+            <p style={{ marginBottom: '1rem' }}>Upload marks for your assigned classes.</p>
             <Link to="/teacher/upload" className="btn-primary" style={{ textDecoration: 'none', display: 'inline-flex', width: 'fit-content' }}>
               Open Uploader <ArrowRight size={18} />
+            </Link>
+          </div>
+        </div>
+
+        <div className="bento-card span-2-col">
+          <div className="card-header">
+            <div className="card-icon" style={{ background: '#d946ef', color: 'white' }}><Target size={24} /></div>
+            <h2 className="card-title">Personal Interviews (PI)</h2>
+          </div>
+          <div className="card-content">
+            <p style={{ marginBottom: '1rem' }}>Log 1-on-1 counselor sessions and verify career paths.</p>
+            <Link to="/counselor" className="btn-primary" style={{ textDecoration: 'none', display: 'inline-flex', width: 'fit-content', background: '#d946ef' }}>
+              PI Workspace <ArrowRight size={18} />
+            </Link>
+          </div>
+        </div>
+
+        <div className="bento-card span-2-col">
+          <div className="card-header">
+            <div className="card-icon" style={{ background: 'var(--amber-500)', color: 'white' }}><ClipboardList size={24} /></div>
+            <h2 className="card-title">Human Review Queue</h2>
+          </div>
+          <div className="card-content">
+            <p style={{ marginBottom: '1rem' }}>Review student tests that the AI scorer flagged for low confidence.</p>
+            <Link to="/staff/review-queue" className="btn-primary" style={{ textDecoration: 'none', display: 'inline-flex', width: 'fit-content', background: 'var(--amber-500)' }}>
+              Open Queue <ArrowRight size={18} />
             </Link>
           </div>
         </div>

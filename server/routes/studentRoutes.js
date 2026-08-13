@@ -19,11 +19,11 @@ router.use(authenticate);
 router.post('/', requireRole(['Admin']), createStudent);
 router.post('/batch', requireRole(['Admin']), createStudentsBatch);
 
-// Admin & Teacher: list students (teacher sees assigned classes via controller filtering)
-router.get('/', requireRole(['Admin', 'Teacher']), getStudents);
+// Admin, Teacher & Counselor: list students (teacher sees assigned classes via controller filtering)
+router.get('/', requireRole(['Admin', 'Teacher', 'Counselor']), getStudents);
 
-// Admin, Teacher, or the student themselves
-router.get('/:id', requireRole(['Admin', 'Teacher', 'Student']), requireSelf('id'), getStudentById);
+// Admin, Teacher, Counselor, or the student themselves
+router.get('/:id', requireRole(['Admin', 'Teacher', 'Counselor', 'Student']), requireSelf('id'), getStudentById);
 
 // Admin-only: update student and reset PIN
 router.put('/:id', requireRole(['Admin']), updateStudent);

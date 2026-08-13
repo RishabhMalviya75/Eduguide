@@ -80,6 +80,18 @@ async function seed() {
   console.log(`   ✅ Teacher: ${teacher.email} / password: teacher123`);
   console.log(`      Assigned: Grade 10-A, 10-B`);
 
+  // --- 3.5 Create Counselor User ---
+  console.log('\n   Creating counselor user...');
+  const counselorPassword = await authService.hashPassword('counselor123');
+  const counselor = await User.create({
+    school_id: school._id,
+    role: 'Counselor',
+    name: 'Ms. Neha Gupta',
+    email: 'neha.gupta@dps001.edu',
+    password_hash: counselorPassword,
+  });
+  console.log(`   ✅ Counselor: ${counselor.email} / password: counselor123`);
+
   // --- 4. Create Students ---
   console.log('\n   Creating test students...');
   const studentsData = [
@@ -132,8 +144,9 @@ async function seed() {
   console.log('='.repeat(50));
   console.log('\nTest Credentials:');
   console.log(`  School Code: ${school.school_code}`);
-  console.log(`  Admin:   admin@dps001.edu / admin123`);
-  console.log(`  Teacher: rahul.verma@dps001.edu / teacher123`);
+  console.log(`  Admin:     admin@dps001.edu / admin123`);
+  console.log(`  Teacher:   rahul.verma@dps001.edu / teacher123`);
+  console.log(`  Counselor: neha.gupta@dps001.edu / counselor123`);
   console.log(`  Student: School Code: DPS001, Roll: 1001, DOB: 2010-03-15`);
   console.log('           (Use verify-identity + set-pin flow for first login)\n');
 

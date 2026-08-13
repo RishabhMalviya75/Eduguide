@@ -143,9 +143,24 @@ async function getActiveScoringPrompt(schoolId) {
 function buildQuestionsPayload(session) {
   return session.questions.map((q, idx) => {
     const studentResponse = session.responses?.get(q._id.toString());
-    const studentAnswer = studentResponse != null ? q.options[studentResponse] : 'No answer';
-    const correctAnswer = q.options[q.correct_option_index];
-    const studentIsCorrect = studentResponse === q.correct_option_index;
+    
+    // Determine student answer text based on format
+    let studentAnswer = 'No answer';
+    if (studentResponse != null) {
+      if (q.format === 'MCQ') {
+        studentAnswer = q.options[studentResponse] || 'Unknown Option';
+      } else {
+        studentAnswer = studentResponse; // Text response
+      }
+    }
+
+    const correctAnswer = q.format === 'MCQ' 
+      ? q.options[q.correct_option_index] 
+      : (q.expected_answers?.join(', ') || 'See rubric');
+
+    const studentIsCorrect = q.format === 'MCQ' 
+      ? studentResponse === q.correct_option_index 
+      : null; // AI will determine correctness for text
 
     return {
       question_index: idx,
@@ -155,6 +170,7 @@ function buildQuestionsPayload(session) {
       student_answer: studentAnswer,
       student_is_correct: studentIsCorrect,
       format: q.format || 'MCQ',
+      scoring_rubric: q.scoring_rubric
     };
   });
 }

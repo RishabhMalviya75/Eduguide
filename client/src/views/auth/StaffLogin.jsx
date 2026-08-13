@@ -22,7 +22,7 @@ export default function StaffLogin() {
 
     if (result.success) {
       if (result.user.role === 'Admin') navigate('/admin');
-      else navigate('/teacher');
+      else navigate('/teacher'); // Teacher and Counselor both go to unified staff dashboard
     } else {
       setError(result.error);
       setLoading(false);
@@ -42,6 +42,15 @@ export default function StaffLogin() {
           <Briefcase size={40} className="auth-icon" />
           <h1 className="auth-title">Staff Portal</h1>
           <p className="auth-subtitle">Sign in to manage classes and students</p>
+          
+          <div style={{ marginTop: '1rem', padding: '1rem', background: 'var(--sky-50)', borderRadius: '8px', border: '1px solid var(--sky-200)', fontSize: '0.85rem', color: 'var(--slate-700)', textAlign: 'left' }}>
+            <strong>Testing Credentials:</strong>
+            <ul style={{ margin: '0.5rem 0 0 0', paddingLeft: '1.2rem', lineHeight: '1.6' }}>
+              <li><strong>Admin:</strong> admin@dps001.edu <br/> <span style={{color: 'var(--slate-500)'}}>Pass: admin123</span></li>
+              <li><strong>Teacher:</strong> rahul.verma@dps001.edu <br/> <span style={{color: 'var(--slate-500)'}}>Pass: teacher123</span></li>
+              <li><strong>Counselor:</strong> neha.gupta@dps001.edu <br/> <span style={{color: 'var(--slate-500)'}}>Pass: counselor123</span></li>
+            </ul>
+          </div>
         </div>
 
         <form className="auth-form" onSubmit={handleSubmit}>

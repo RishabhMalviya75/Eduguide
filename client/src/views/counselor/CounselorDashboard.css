@@ -1,0 +1,141 @@
+.counselor-dashboard {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  margin-bottom: 2rem;
+}
+
+.dashboard-header h1 {
+  margin: 0 0 0.5rem 0;
+  color: var(--slate-800);
+}
+
+.dashboard-header p {
+  color: var(--slate-500);
+  margin: 0;
+}
+
+.dashboard-layout {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.student-list-col {
+  width: 300px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid var(--slate-200);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.student-list-col h3 {
+  padding: 1rem;
+  margin: 0;
+  border-bottom: 1px solid var(--slate-200);
+  background: var(--slate-50);
+}
+
+.student-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.student-list li {
+  padding: 1rem;
+  border-bottom: 1px solid var(--slate-100);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+
+.student-list li:hover {
+  background: var(--slate-50);
+}
+
+.student-list li.active {
+  background: var(--sky-50);
+  border-left: 4px solid var(--sky-500);
+}
+
+.student-list li span {
+  font-size: 0.8rem;
+  color: var(--slate-500);
+  margin-top: 0.25rem;
+}
+
+.pi-form-col {
+  flex-grow: 1;
+}
+
+.pi-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 1.5rem;
+}
+
+.form-section h4 {
+  margin: 0 0 1rem 0;
+  color: var(--slate-700);
+  border-bottom: 1px solid var(--slate-200);
+  padding-bottom: 0.5rem;
+}
+
+.rubric-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.rubric-item {
+  display: flex;
+  flex-direction: column;
+  background: var(--slate-50);
+  padding: 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--slate-200);
+}
+
+.rubric-item label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--slate-600);
+  margin-bottom: 0.5rem;
+}
+
+.rubric-item input[type="range"] {
+  width: 100%;
+}
+
+.rubric-val {
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: var(--sky-600);
+  margin-top: 0.5rem;
+}
+
+.form-section input[type="text"],
+.form-section textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--slate-300);
+  border-radius: 6px;
+  font-family: inherit;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--slate-200);
+}

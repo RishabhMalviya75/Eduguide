@@ -10,11 +10,15 @@ export default function StudentDashboard() {
   const { user, logout } = useAuth();
   const [history, setHistory] = useState([]);
   const [insights, setInsights] = useState(null);
+  const [careerInterest, setCareerInterest] = useState(null);
 
   useEffect(() => {
     fetchHistory();
     fetchInsights();
-  }, []);
+    if (user?.student_id) {
+      fetchCareerInterest(user.student_id);
+    }
+  }, [user]);
 
   const fetchHistory = async () => {
     try {
@@ -35,6 +39,23 @@ export default function StudentDashboard() {
       }
     } catch (err) {
       console.error('Failed to fetch insights', err);
+    }
+  };
+
+  const fetchCareerInterest = async (studentId) => {
+    try {
+      // Fetch latest PI history to get career interest mapped results
+      const res = await api.get(`/pi/student/${studentId}`);
+      if (res.success && res.data.length > 0) {
+        // Since CareerInterestResult is generated on PI submit, we can just fetch the PI session 
+        // Wait, the API returns PISession history. I should fetch the CareerInterestResult directly.
+        const intRes = await api.get(`/pi/student/${studentId}/interest`); // I need to create this route!
+        if (intRes.success && intRes.data) {
+          setCareerInterest(intRes.data);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch career interest', err);
     }
   };
 
@@ -82,7 +103,7 @@ export default function StudentDashboard() {
         <div className="bento-card span-4-col" style={{ background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)' }}>
           <div className="card-header">
             <div className="card-icon" style={{ background: 'var(--sky-500)', color: 'white' }}><Zap size={24} /></div>
-            <h2 className="card-title">Career AI Matches</h2>
+            <h2 className="card-title">Career AI Matches (Test Based)</h2>
           </div>
           <div className="card-content">
             {insights && insights.matches && insights.matches.length > 0 ? (
@@ -107,10 +128,30 @@ export default function StudentDashboard() {
                 ))}
               </div>
             ) : (
-              <p style={{ color: 'var(--slate-600)' }}>Take the aptitude test and ensure your marks are uploaded to see your career matches!</p>
+              <p style={{ color: 'var(--slate-600)' }}>Take the aptitude test and ensure your marks are uploaded to see your test-based matches!</p>
             )}
           </div>
         </div>
+
+        {/* Career Interest Zone (PI Based) */}
+        {careerInterest && careerInterest.suggestions.length > 0 && (
+          <div className="bento-card span-4-col" style={{ background: 'linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%)' }}>
+            <div className="card-header">
+              <div className="card-icon" style={{ background: '#d946ef', color: 'white' }}><Target size={24} /></div>
+              <h2 className="card-title">Career Interest Zone (Counselor Verified)</h2>
+            </div>
+            <div className="card-content">
+              <p style={{ color: 'var(--slate-600)', marginBottom: '1rem' }}>Based on your latest Personal Interview (PI) session.</p>
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                {careerInterest.suggestions.map((suggestion, idx) => (
+                  <div key={idx} style={{ background: 'white', padding: '1rem 1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid #f0abfc', fontWeight: 'bold', color: '#86198f' }}>
+                    {suggestion}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Skill Radar Chart */}
         <div className="bento-card span-2-col">

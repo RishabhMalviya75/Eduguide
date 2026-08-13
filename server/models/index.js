@@ -7,6 +7,8 @@ const CareerProfile = require('./CareerProfile');
 const PromptVersion = require('./PromptVersion');
 const AuditLog = require('./AuditLog');
 const Score = require('./Score');
+const PISession = require('./PISession');
+const CareerInterestResult = require('./CareerInterestResult');
 
 module.exports = {
   School,
@@ -18,4 +20,6 @@ module.exports = {
   PromptVersion,
   AuditLog,
   Score,
+  PISession,
+  CareerInterestResult,
 };
