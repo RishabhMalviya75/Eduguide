@@ -49,6 +49,7 @@ async function staffLogin(req, res) {
         email: user.email,
         role: user.role,
         school_id: user.school_id,
+        assigned_classes: user.assigned_classes || [],
       },
     },
   });

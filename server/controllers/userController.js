@@ -1,6 +1,30 @@
-const { User } = require('../models');
+const { User, Student } = require('../models');
+const TestSession = require('../models/TestSession');
 const { ApiError } = require('../middleware/errorHandler');
 const authService = require('../services/authService');
+
+async function getAdminStats(req, res, next) {
+  try {
+    const schoolId = req.schoolId;
+
+    const [totalStudents, totalTeachers, totalTests] = await Promise.all([
+      Student.countDocuments().setOptions({ schoolId }),
+      User.countDocuments({ role: 'Teacher' }).setOptions({ schoolId }),
+      TestSession.countDocuments({ status: 'completed' }).setOptions({ schoolId })
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        totalStudents,
+        totalTeachers,
+        totalTests
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+}
 
 /**
  * Create a new staff user (Admin or Teacher).
@@ -138,4 +162,4 @@ async function resetPassword(req, res) {
   });
 }
 
-module.exports = { createUser, getUsers, getUserById, updateUser, resetPassword };
+module.exports = { getAdminStats, createUser, getUsers, getUserById, updateUser, resetPassword };

@@ -31,9 +31,13 @@ export default function TeacherDashboard() {
           <div className="card-content">
             <p>You are assigned to:</p>
             <ul style={{ marginTop: '0.5rem', paddingLeft: '1.5rem', color: 'var(--slate-600)' }}>
-              {user?.assigned_classes?.map((c, i) => (
-                <li key={i}>Grade {c.grade} - Section {c.section}</li>
-              ))}
+              {user?.assigned_classes && user.assigned_classes.length > 0 ? (
+                user.assigned_classes.map((c, i) => (
+                  <li key={i} style={{ marginBottom: '0.5rem' }}><strong>Grade {c.grade}</strong> - Section {c.section}</li>
+                ))
+              ) : (
+                <li style={{ color: 'var(--error-text)' }}>No classes assigned yet.</li>
+              )}
             </ul>
           </div>
         </div>

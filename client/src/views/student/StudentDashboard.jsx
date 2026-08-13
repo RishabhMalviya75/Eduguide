@@ -1,8 +1,9 @@
 import { useAuth } from '../../context/AuthContext';
-import { LogOut, GraduationCap, BrainCircuit, Target, ArrowRight, Zap } from 'lucide-react';
+import { LogOut, GraduationCap, BrainCircuit, Target, ArrowRight, Zap, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { api } from '../../api/client';
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import '../../App.css'; 
 
 export default function StudentDashboard() {
@@ -37,6 +38,27 @@ export default function StudentDashboard() {
     }
   };
 
+  // Prepare data for the radar chart
+  const radarData = useMemo(() => {
+    if (!insights) return [];
+    
+    const dataPoints = [];
+    const { academicStats = {}, aptitudeStats = {} } = insights;
+    
+    // Convert 0-1 scale to 0-100
+    Object.entries(academicStats).forEach(([subject, score]) => {
+      dataPoints.push({ subject, score: Math.round(score * 100) });
+    });
+    
+    if (aptitudeStats) {
+      Object.entries(aptitudeStats).forEach(([skill, score]) => {
+        dataPoints.push({ subject: skill, score: Math.round(score * 100) });
+      });
+    }
+    
+    return dataPoints;
+  }, [insights]);
+
   return (
     <div className="app-container">
       <header className="header" style={{ justifyContent: 'space-between' }}>
@@ -66,7 +88,7 @@ export default function StudentDashboard() {
             {insights && insights.matches && insights.matches.length > 0 ? (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
                 {insights.matches.map((match, idx) => (
-                  <div key={match.careerId} style={{ background: 'white', padding: '1.5rem', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)' }}>
+                  <div key={match.careerId} style={{ background: 'white', padding: '1.5rem', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)', transition: 'transform 0.2s', cursor: 'default' }} className="hover-lift">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
                       <h3 style={{ fontSize: '1.1rem', color: 'var(--slate-800)', margin: 0 }}>{match.title}</h3>
                       <span style={{ 
@@ -90,13 +112,26 @@ export default function StudentDashboard() {
           </div>
         </div>
 
+        {/* Skill Radar Chart */}
         <div className="bento-card span-2-col">
           <div className="card-header">
-            <div className="card-icon"><Target size={24} /></div>
-            <h2 className="card-title">My Performance</h2>
+            <div className="card-icon"><TrendingUp size={24} /></div>
+            <h2 className="card-title">My Skill Radar</h2>
           </div>
-          <div className="card-content">
-            <p>Your latest marks and academic performance will appear here.</p>
+          <div className="card-content" style={{ height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {radarData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
+                  <PolarGrid stroke="#e2e8f0" />
+                  <PolarAngleAxis dataKey="subject" tick={{ fill: '#475569', fontSize: 12 }} />
+                  <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
+                  <Radar name="Score" dataKey="score" stroke="#0ea5e9" fill="#38bdf8" fillOpacity={0.5} />
+                  <Tooltip />
+                </RadarChart>
+              </ResponsiveContainer>
+            ) : (
+              <p style={{ color: 'var(--slate-400)', textAlign: 'center' }}>Waiting for test data...</p>
+            )}
           </div>
         </div>
 
@@ -106,7 +141,7 @@ export default function StudentDashboard() {
             <h2 className="card-title">Aptitude Tests</h2>
           </div>
           <div className="card-content">
-            <p style={{ marginBottom: '1.5rem' }}>Take the diagnostic test to uncover your career matches.</p>
+            <p style={{ marginBottom: '1.5rem', color: 'var(--slate-600)' }}>Take the diagnostic test to uncover your career matches.</p>
             
             <Link to="/student/test" className="btn-primary" style={{ textDecoration: 'none', display: 'inline-flex', width: 'fit-content', marginBottom: '2rem' }}>
               Start New Test <ArrowRight size={18} />
