@@ -31,6 +31,16 @@ const config = {
   corsOrigins: process.env.CORS_ORIGINS
     ? process.env.CORS_ORIGINS.split(',')
     : ['http://localhost:5173', 'http://localhost:5174'], // Vite default ports
+
+  // AI Scoring
+  ai: {
+    openaiApiKey: process.env.OPENAI_API_KEY || null,
+    model: process.env.AI_SCORING_MODEL || 'gpt-4o-mini',
+    confidenceThreshold: parseFloat(process.env.AI_CONFIDENCE_THRESHOLD) || 0.7,
+    scoringEnabled: process.env.AI_SCORING_ENABLED === 'true', // Feature flag: when true, AI score replaces rule-based
+    // If no API key is set, the service automatically runs in mock mode
+    get isMockMode() { return !this.openaiApiKey; },
+  },
 };
 
 // Validate critical config at startup

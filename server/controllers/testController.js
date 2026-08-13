@@ -1,6 +1,7 @@
 const { ApiError } = require('../middleware/errorHandler');
 const Question = require('../models/Question');
 const TestSession = require('../models/TestSession');
+const { scoreTestSession } = require('../services/aiScoringService');
 
 /**
  * Start a new test session for a student.
@@ -104,27 +105,32 @@ exports.submitTest = async (req, res, next) => {
       throw new ApiError(404, 'Active test session not found or already completed.');
     }
 
-    // 2. Calculate score
-    let score = 0;
-    const responseMap = new Map(Object.entries(responses)); // Format: { "questionIdString": selectedIndexNumber }
-
-    session.questions.forEach(question => {
-      const qId = question._id.toString();
-      if (responseMap.has(qId)) {
-        const selectedOption = responseMap.get(qId);
-        if (selectedOption === question.correct_option_index) {
-          score += 1;
-        }
-      }
-    });
-
-    // 3. Save results
+    // 2. Save responses and mark as completed
     session.status = 'completed';
     session.completed_at = new Date();
-    session.responses = responses; // Mongoose will convert this object to a Map
-    session.score = score;
+    session.responses = responses;
     session.max_score = session.questions.length;
 
+    // 3. AI-based scoring (primary)
+    //    Falls back to rule-based if AI pipeline fails.
+    let finalScore;
+    try {
+      const aiResult = await scoreTestSession(session, schoolId);
+      if (aiResult && aiResult.total_score != null) {
+        finalScore = aiResult.total_score;
+        console.log(`[Scoring] AI score used: ${finalScore}/${session.max_score}`);
+      } else {
+        // AI returned but no usable score — fall back
+        finalScore = ruleFallback(session);
+        console.warn('[Scoring] AI returned no score, fell back to rule-based');
+      }
+    } catch (err) {
+      // AI failed entirely — graceful degradation to rule-based
+      console.error('[Scoring] AI failed, falling back to rule-based:', err.message);
+      finalScore = ruleFallback(session);
+    }
+
+    session.score = finalScore;
     await session.save();
 
     res.status(200).json({
@@ -140,6 +146,21 @@ exports.submitTest = async (req, res, next) => {
     next(error);
   }
 };
+
+/**
+ * Rule-based fallback scorer — used only if the AI pipeline fails.
+ */
+function ruleFallback(session) {
+  let score = 0;
+  session.questions.forEach(question => {
+    const qId = question._id.toString();
+    const studentResponse = session.responses?.get(qId);
+    if (studentResponse != null && studentResponse === question.correct_option_index) {
+      score += 1;
+    }
+  });
+  return score;
+}
 
 /**
  * Get history of completed tests for the student.
