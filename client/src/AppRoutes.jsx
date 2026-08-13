@@ -10,6 +10,7 @@ import AdminDashboard from './views/admin/AdminDashboard';
 import TeacherDashboard from './views/teacher/TeacherDashboard';
 import MarksUpload from './views/teacher/MarksUpload';
 import StudentDashboard from './views/student/StudentDashboard';
+import AptitudeTest from './views/student/AptitudeTest';
 
 export default function AppRoutes() {
   const { user } = useAuth();
@@ -59,10 +60,18 @@ export default function AppRoutes() {
 
       {/* Protected Student Routes */}
       <Route 
-        path="/student/*" 
+        path="/student" 
         element={
           <ProtectedRoute allowedRoles={['Student']}>
             <StudentDashboard />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/student/test" 
+        element={
+          <ProtectedRoute allowedRoles={['Student']}>
+            <AptitudeTest />
           </ProtectedRoute>
         } 
       />

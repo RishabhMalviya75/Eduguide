@@ -1,9 +1,28 @@
 import { useAuth } from '../../context/AuthContext';
-import { LogOut, GraduationCap, BrainCircuit, Target } from 'lucide-react';
+import { LogOut, GraduationCap, BrainCircuit, Target, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { api } from '../../api/client';
 import '../../App.css'; 
 
 export default function StudentDashboard() {
   const { user, logout } = useAuth();
+  const [history, setHistory] = useState([]);
+
+  useEffect(() => {
+    fetchHistory();
+  }, []);
+
+  const fetchHistory = async () => {
+    try {
+      const res = await api.get('/tests/history');
+      if (res.success) {
+        setHistory(res.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch test history', err);
+    }
+  };
 
   return (
     <div className="app-container">
@@ -40,7 +59,27 @@ export default function StudentDashboard() {
             <h2 className="card-title">Aptitude Tests</h2>
           </div>
           <div className="card-content">
-            <p>No active tests right now. Check back later!</p>
+            <p style={{ marginBottom: '1.5rem' }}>Take the diagnostic test to uncover your career matches.</p>
+            
+            <Link to="/student/test" className="btn-primary" style={{ textDecoration: 'none', display: 'inline-flex', width: 'fit-content', marginBottom: '2rem' }}>
+              Start New Test <ArrowRight size={18} />
+            </Link>
+
+            {history.length > 0 && (
+              <div>
+                <h3 style={{ fontSize: '1.1rem', color: 'var(--slate-700)', marginBottom: '1rem' }}>Past Tests</h3>
+                {history.map(test => (
+                  <div key={test._id} style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem', background: 'var(--slate-50)', borderRadius: 'var(--radius-md)', marginBottom: '0.5rem', border: '1px solid var(--slate-200)' }}>
+                    <div>
+                      <strong>Score: {test.score}/{test.max_score}</strong>
+                    </div>
+                    <div style={{ color: 'var(--slate-500)' }}>
+                      {new Date(test.completed_at).toLocaleDateString()}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </main>
