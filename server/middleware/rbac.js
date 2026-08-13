@@ -41,8 +41,8 @@ function requireSelf(paramKey = 'id') {
       throw new ApiError(401, 'Authentication required.');
     }
 
-    // Admin and Teacher can access any student within their school scope
-    if (req.user.role === 'Admin' || req.user.role === 'Teacher') {
+    // Admin, Teacher, and Counselor can access any student within their school scope
+    if (req.user.role === 'Admin' || req.user.role === 'Teacher' || req.user.role === 'Counselor') {
       return next();
     }
 

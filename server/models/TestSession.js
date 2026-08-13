@@ -42,7 +42,32 @@ const testSessionSchema = new mongoose.Schema({
   max_score: {
     type: Number,
     default: null,
-  }
+  },
+  // Proctoring integrity signals — populated by client-side capture + server-side rules
+  integrity_flags: {
+    ip_log: {
+      type: [String],
+      default: [],
+    },
+    focus_loss_count: {
+      type: Number,
+      default: 0,
+    },
+    typing_pattern_signal: {
+      type: Number,
+      default: null,
+      // 0.0–1.0 anomaly score; null means not yet analyzed
+    },
+    auto_flagged: {
+      type: Boolean,
+      default: false,
+    },
+    flag_reasons: {
+      type: [String],
+      default: [],
+      // e.g. ['excessive_focus_loss', 'ip_mismatch']
+    },
+  },
 }, {
   timestamps: true,
 });

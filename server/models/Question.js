@@ -12,20 +12,32 @@ const questionSchema = new mongoose.Schema({
     required: [true, 'Question text is required'],
     trim: true,
   },
+  format: {
+    type: String,
+    enum: ['MCQ', 'short_answer', 'essay'],
+    default: 'MCQ',
+  },
   options: {
     type: [String],
-    required: [true, 'Options are required'],
-    validate: {
-      validator: function(v) {
-        return v.length >= 2;
-      },
-      message: 'A question must have at least 2 options.'
-    }
+    default: [],
+    // Required only for MCQ format — validated in pre-save hook below
   },
   correct_option_index: {
     type: Number,
-    required: [true, 'Correct option index is required'],
+    default: null,
     min: [0, 'Index cannot be negative'],
+    // Required only for MCQ format — validated in pre-save hook below
+  },
+  // For short_answer format: the expected answer(s) for rule-based scoring
+  expected_answers: {
+    type: [String],
+    default: [],
+  },
+  // For essay format: rubric or scoring guidance for AI scorer
+  scoring_rubric: {
+    type: String,
+    default: null,
+    trim: true,
   },
   category: {
     type: String,
@@ -45,13 +57,20 @@ const questionSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-// Ensure correct_option_index is within bounds of options array
+// Validate format-specific required fields
 questionSchema.pre('save', function(next) {
-  if (this.correct_option_index >= this.options.length) {
-    next(new Error(`Correct option index (${this.correct_option_index}) is out of bounds for options array (length ${this.options.length})`));
-  } else {
-    next();
+  if (this.format === 'MCQ') {
+    if (!this.options || this.options.length < 2) {
+      return next(new Error('MCQ questions must have at least 2 options.'));
+    }
+    if (this.correct_option_index == null) {
+      return next(new Error('MCQ questions must have a correct_option_index.'));
+    }
+    if (this.correct_option_index >= this.options.length) {
+      return next(new Error(`Correct option index (${this.correct_option_index}) is out of bounds for options array (length ${this.options.length})`));
+    }
   }
+  next();
 });
 
 // Apply tenant isolation plugin
