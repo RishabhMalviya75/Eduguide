@@ -8,6 +8,7 @@ import StaffLogin from './views/auth/StaffLogin';
 import StudentLogin from './views/auth/StudentLogin';
 import AdminDashboard from './views/admin/AdminDashboard';
 import TeacherDashboard from './views/teacher/TeacherDashboard';
+import MarksUpload from './views/teacher/MarksUpload';
 import StudentDashboard from './views/student/StudentDashboard';
 
 export default function AppRoutes() {
@@ -40,10 +41,18 @@ export default function AppRoutes() {
 
       {/* Protected Teacher Routes */}
       <Route 
-        path="/teacher/*" 
+        path="/teacher" 
         element={
           <ProtectedRoute allowedRoles={['Teacher']}>
             <TeacherDashboard />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/teacher/upload" 
+        element={
+          <ProtectedRoute allowedRoles={['Teacher']}>
+            <MarksUpload />
           </ProtectedRoute>
         } 
       />

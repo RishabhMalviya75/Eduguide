@@ -1,5 +1,6 @@
 import { useAuth } from '../../context/AuthContext';
-import { LogOut, Presentation, Users, BookCheck } from 'lucide-react';
+import { LogOut, Presentation, Users, BookCheck, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import '../../App.css'; 
 
 export default function TeacherDashboard() {
@@ -43,7 +44,10 @@ export default function TeacherDashboard() {
             <h2 className="card-title">Marks Upload Pipeline</h2>
           </div>
           <div className="card-content">
-            <p>Upload marks for your assigned classes (Sprint 3 feature).</p>
+            <p style={{ marginBottom: '1rem' }}>Upload marks for your assigned classes (Sprint 3 feature).</p>
+            <Link to="/teacher/upload" className="btn-primary" style={{ textDecoration: 'none', display: 'inline-flex', width: 'fit-content' }}>
+              Open Uploader <ArrowRight size={18} />
+            </Link>
           </div>
         </div>
       </main>

@@ -10,6 +10,7 @@ const authRoutes = require('./routes/authRoutes');
 const schoolRoutes = require('./routes/schoolRoutes');
 const userRoutes = require('./routes/userRoutes');
 const studentRoutes = require('./routes/studentRoutes');
+const marksRoutes = require('./routes/marksRoutes');
 
 const app = express();
 
@@ -48,6 +49,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/schools', schoolRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/students', studentRoutes);
+app.use('/api/marks', marksRoutes);
 
 // --- Error Handling ---
 app.use(notFound);
