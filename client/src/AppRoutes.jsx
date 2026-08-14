@@ -1,8 +1,8 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import AppLayout from './components/AppLayout';
 
-// View placeholders (will be implemented next)
 import RoleSelection from './views/auth/RoleSelection';
 import StaffLogin from './views/auth/StaffLogin';
 import StudentLogin from './views/auth/StudentLogin';
@@ -20,14 +20,17 @@ export default function AppRoutes() {
 
   return (
     <Routes>
-      {/* Public Routes */}
-      <Route path="/" element={
-        user ? (
-          user.role === 'Admin' ? <Navigate to="/admin" /> :
-          (user.role === 'Teacher' || user.role === 'Counselor') ? <Navigate to="/teacher" /> :
-          <Navigate to="/student" />
-        ) : <RoleSelection />
-      } />
+      {/* Public Unauthenticated Routes */}
+      <Route 
+        path="/" 
+        element={
+          user ? (
+            user.role === 'Admin' ? <Navigate to="/admin" /> :
+            (user.role === 'Teacher' || user.role === 'Counselor') ? <Navigate to="/teacher" /> :
+            <Navigate to="/student" />
+          ) : <RoleSelection />
+        } 
+      />
       
       <Route path="/login/staff" element={<StaffLogin />} />
       <Route path="/login/student" element={<StudentLogin />} />
@@ -37,33 +40,45 @@ export default function AppRoutes() {
         path="/admin/*" 
         element={
           <ProtectedRoute allowedRoles={['Admin']}>
-            <AdminDashboard />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/staff/review-queue" 
-        element={
-          <ProtectedRoute allowedRoles={['Admin', 'Teacher', 'Counselor']}>
-            <ReviewQueue />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/counselor" 
-        element={
-          <ProtectedRoute allowedRoles={['Counselor', 'Teacher', 'Admin']}>
-            <CounselorDashboard />
+            <AppLayout>
+              <AdminDashboard />
+            </AppLayout>
           </ProtectedRoute>
         } 
       />
 
-      {/* Protected Teacher/Staff Routes */}
+      {/* Protected Review Queue */}
+      <Route 
+        path="/staff/review-queue" 
+        element={
+          <ProtectedRoute allowedRoles={['Admin', 'Teacher', 'Counselor']}>
+            <AppLayout>
+              <ReviewQueue />
+            </AppLayout>
+          </ProtectedRoute>
+        } 
+      />
+
+      {/* Protected Counselor Workspace */}
+      <Route 
+        path="/counselor" 
+        element={
+          <ProtectedRoute allowedRoles={['Counselor', 'Teacher', 'Admin']}>
+            <AppLayout>
+              <CounselorDashboard />
+            </AppLayout>
+          </ProtectedRoute>
+        } 
+      />
+
+      {/* Protected Teacher Routes */}
       <Route 
         path="/teacher" 
         element={
           <ProtectedRoute allowedRoles={['Teacher', 'Counselor', 'Admin']}>
-            <TeacherDashboard />
+            <AppLayout>
+              <TeacherDashboard />
+            </AppLayout>
           </ProtectedRoute>
         } 
       />
@@ -71,7 +86,9 @@ export default function AppRoutes() {
         path="/teacher/upload" 
         element={
           <ProtectedRoute allowedRoles={['Teacher', 'Counselor', 'Admin']}>
-            <MarksUpload />
+            <AppLayout>
+              <MarksUpload />
+            </AppLayout>
           </ProtectedRoute>
         } 
       />
@@ -81,7 +98,9 @@ export default function AppRoutes() {
         path="/student" 
         element={
           <ProtectedRoute allowedRoles={['Student']}>
-            <StudentDashboard />
+            <AppLayout>
+              <StudentDashboard />
+            </AppLayout>
           </ProtectedRoute>
         } 
       />
@@ -89,7 +108,9 @@ export default function AppRoutes() {
         path="/student/report/:id" 
         element={
           <ProtectedRoute allowedRoles={['Student', 'Admin', 'Teacher', 'Counselor']}>
-            <StudentReport />
+            <AppLayout>
+              <StudentReport />
+            </AppLayout>
           </ProtectedRoute>
         } 
       />
@@ -97,7 +118,9 @@ export default function AppRoutes() {
         path="/student/test" 
         element={
           <ProtectedRoute allowedRoles={['Student']}>
-            <AptitudeTest />
+            <AppLayout>
+              <AptitudeTest />
+            </AppLayout>
           </ProtectedRoute>
         } 
       />
