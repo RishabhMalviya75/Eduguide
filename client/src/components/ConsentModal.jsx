@@ -43,17 +43,17 @@ export default function ConsentModal({ studentId, onConsentGranted }) {
       padding: '1rem'
     }}>
       <div style={{ 
-        maxWidth: '560px', 
+        maxWidth: '480px', 
         width: '100%', 
         background: '#FFFFFF', 
         borderRadius: '16px',
         boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
-        padding: '3rem 2.5rem',
+        padding: '2rem',
         border: '1px solid var(--slate-200)'
       }}>
         <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-          <ShieldCheck size={52} color="#0EA5E9" style={{ margin: '0 auto', strokeWidth: 2.5 }} />
-          <h2 style={{ color: '#0F172A', marginTop: '1.25rem', fontSize: '1.75rem', fontWeight: 800 }}>Data Privacy & Consent</h2>
+          <ShieldCheck size={44} color="#0EA5E9" style={{ margin: '0 auto', strokeWidth: 2.5 }} />
+          <h2 style={{ color: '#0F172A', marginTop: '1rem', fontSize: '1.4rem', fontWeight: 800 }}>Data Privacy & Consent</h2>
         </div>
         
         <div style={{ color: '#475569', lineHeight: '1.7', marginBottom: '2.5rem', fontSize: '0.95rem' }}>
@@ -71,7 +71,7 @@ export default function ConsentModal({ studentId, onConsentGranted }) {
         <div style={{ display: 'flex', gap: '1rem' }}>
           <button 
             className="btn-secondary" 
-            style={{ flex: 1, padding: '0.875rem', justifyContent: 'center', fontSize: '1rem' }}
+            style={{ flex: 1, padding: '0.75rem', justifyContent: 'center', fontSize: '0.95rem' }}
             onClick={handleDecline}
             disabled={loading}
           >
@@ -79,7 +79,7 @@ export default function ConsentModal({ studentId, onConsentGranted }) {
           </button>
           <button 
             className="btn-primary" 
-            style={{ flex: 1, padding: '0.875rem', justifyContent: 'center', fontSize: '1rem', background: '#0F172A' }}
+            style={{ flex: 1, padding: '0.75rem', justifyContent: 'center', fontSize: '0.95rem', background: '#0F172A' }}
             onClick={handleAccept}
             disabled={loading}
           >

@@ -289,4 +289,13 @@
   .span-12, .span-8, .span-6, .span-4, .span-3 {
     grid-column: span 1;
   }
+  .app-top-header {
+    padding: 0 1rem;
+  }
+  .header-search {
+    display: none;
+  }
+  .header-actions .badge {
+    display: none;
+  }
 }

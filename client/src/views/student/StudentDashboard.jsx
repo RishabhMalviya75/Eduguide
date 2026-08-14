@@ -103,11 +103,11 @@ export default function StudentDashboard() {
           }
         ],
         aptitudeStats: {
-          'Logic': 0.62,
-          'Math': 0.58,
-          'Verbal': 0.65,
-          'Spatial': 0.60,
-          'Problem': 0.55
+          'Logic': 0.72,
+          'Math': 0.45,
+          'Verbal': 0.62,
+          'Spatial': 0.85,
+          'Problem': 0.50
         }
       });
       
@@ -259,7 +259,14 @@ export default function StudentDashboard() {
           <div style={{ height: '280px', width: '100%', marginTop: '1rem' }}>
             {barData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={barData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }} barCategoryGap="20%">
+                <BarChart data={barData} margin={{ top: 0, right: 0, left: 0, bottom: 20 }} barCategoryGap="20%">
+                  <XAxis 
+                    dataKey="subject" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fill: '#64748B', fontSize: 12, fontWeight: 500 }} 
+                    dy={15} 
+                  />
                   <RechartsTooltip 
                     cursor={{ fill: 'transparent' }}
                     contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
