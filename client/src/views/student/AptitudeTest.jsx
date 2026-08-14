@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { api } from '../../api/client';
 import { useNavigate } from 'react-router-dom';
-import { Clock, ChevronLeft, ChevronRight, CheckCircle, AlertCircle, Loader2, ShieldAlert } from 'lucide-react';
+import { Clock, ChevronLeft, ChevronRight, CheckCircle, AlertCircle, Loader2, ShieldAlert, Maximize2, Check, ArrowRight } from 'lucide-react';
 
 export default function AptitudeTest() {
   const navigate = useNavigate();
@@ -9,47 +9,103 @@ export default function AptitudeTest() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [submitResult, setSubmitResult] = useState(null);
   const [focusLossCount, setFocusLossCount] = useState(0);
-  
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [responses, setResponses] = useState({});
   const [timeLeft, setTimeLeft] = useState(15 * 60);
 
   const timerRef = useRef(null);
 
+  // Fullscreen and Focus Loss Listeners
   useEffect(() => {
-    const handleBlur = () => {
-      if (session && !session.completed_at) {
+    const handleFocusLoss = () => {
+      if (session && !submitResult && !submitting) {
         setFocusLossCount(prev => prev + 1);
       }
     };
 
-    window.addEventListener('blur', handleBlur);
-    return () => window.removeEventListener('blur', handleBlur);
-  }, [session]);
+    const handleFullscreenChange = () => {
+      const active = !!document.fullscreenElement;
+      setIsFullscreen(active);
+      if (!active && session && !submitResult && !submitting) {
+        setFocusLossCount(prev => prev + 1);
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden' && session && !submitResult && !submitting) {
+        setFocusLossCount(prev => prev + 1);
+      }
+    };
+
+    window.addEventListener('blur', handleFocusLoss);
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('blur', handleFocusLoss);
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [session, submitResult, submitting]);
 
   useEffect(() => {
     startTest();
     return () => clearInterval(timerRef.current);
   }, []);
 
+  const requestFullscreen = async () => {
+    try {
+      const elem = document.documentElement;
+      if (elem.requestFullscreen) {
+        await elem.requestFullscreen();
+      } else if (elem.webkitRequestFullscreen) {
+        await elem.webkitRequestFullscreen();
+      }
+      setIsFullscreen(true);
+    } catch (err) {
+      console.warn('Fullscreen request denied or not supported', err);
+    }
+  };
+
+  const exitFullscreen = () => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {});
+    }
+  };
+
   const startTest = async () => {
     try {
+      setLoading(true);
+      setError(null);
       const res = await api.post('/tests/start');
       if (res.success) {
         setSession(res.data);
-        
-        const startedAt = new Date(res.data.started_at).getTime();
+
+        const startedAt = new Date(res.data.started_at || Date.now()).getTime();
         const now = Date.now();
         const elapsedSeconds = Math.floor((now - startedAt) / 1000);
         const remaining = Math.max(0, (15 * 60) - elapsedSeconds);
         setTimeLeft(remaining);
-        
+
         if (res.data.responses) {
-          setResponses(res.data.responses);
+          const initResponses = {};
+          if (typeof res.data.responses === 'object') {
+            Object.entries(res.data.responses).forEach(([k, v]) => {
+              initResponses[k] = v;
+            });
+          }
+          setResponses(initResponses);
         }
 
         startTimer(remaining);
+        // Attempt to enter fullscreen
+        requestFullscreen();
+      } else {
+        setError(res.error || 'Unable to start test session.');
       }
     } catch (err) {
       setError(err.message || 'Failed to start test.');
@@ -60,7 +116,7 @@ export default function AptitudeTest() {
 
   const startTimer = (initialTime) => {
     if (timerRef.current) clearInterval(timerRef.current);
-    
+
     let time = initialTime;
     timerRef.current = setInterval(() => {
       time -= 1;
@@ -79,7 +135,8 @@ export default function AptitudeTest() {
   const submitTest = async (currentResponses) => {
     if (!session || submitting) return;
     setSubmitting(true);
-    clearInterval(timerRef.current);
+    setError(null);
+    if (timerRef.current) clearInterval(timerRef.current);
 
     try {
       const res = await api.post('/tests/submit', {
@@ -89,25 +146,38 @@ export default function AptitudeTest() {
           focus_loss_count: focusLossCount
         }
       });
+
       if (res.success) {
-        navigate('/student');
+        exitFullscreen();
+        setSubmitResult(res.data);
+      } else {
+        setError(res.error || 'Failed to submit test.');
+        setSubmitting(false);
       }
     } catch (err) {
-      setError(err.message || 'Failed to submit test.');
+      setError(err.message || 'Failed to submit test. Please check network and try again.');
       setSubmitting(false);
     }
   };
 
   const handleManualSubmit = () => {
-    if (window.confirm("Are you sure you want to submit your test? Answers cannot be changed after submission.")) {
+    const answeredCount = Object.keys(responses).length;
+    const totalCount = session?.questions?.length || 0;
+
+    let confirmMsg = "Are you sure you want to submit your evaluation?";
+    if (answeredCount < totalCount) {
+      confirmMsg = `You have answered ${answeredCount} of ${totalCount} questions. Submit anyway?`;
+    }
+
+    if (window.confirm(confirmMsg)) {
       submitTest(responses);
     }
   };
 
-  const handleOptionSelect = (qId, optionIndex) => {
+  const handleOptionSelect = (qId, val) => {
     setResponses(prev => ({
       ...prev,
-      [qId]: optionIndex
+      [qId]: val
     }));
   };
 
@@ -125,13 +195,71 @@ export default function AptitudeTest() {
     );
   }
 
+  // Submission Complete View
+  if (submitResult) {
+    return (
+      <div className="dash-card span-12" style={{ textAlign: 'center', maxWidth: '600px', margin: '3rem auto', padding: '2.5rem' }}>
+        <div style={{
+          width: '64px',
+          height: '64px',
+          borderRadius: '50%',
+          background: '#D1FAE5',
+          color: '#059669',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          margin: '0 auto 1.25rem auto'
+        }}>
+          <CheckCircle size={36} />
+        </div>
+        <h2 style={{ fontSize: '1.75rem', color: 'var(--slate-900)', marginBottom: '0.5rem' }}>
+          Assessment Submitted!
+        </h2>
+        <p style={{ color: 'var(--slate-600)', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
+          Your responses have been processed and analyzed by our AI evaluation engine.
+        </p>
+
+        <div style={{
+          background: 'var(--slate-50, #F8FAFC)',
+          border: '1px solid var(--slate-200, #E2E8F0)',
+          borderRadius: '12px',
+          padding: '1.25rem',
+          marginBottom: '2rem',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '1rem'
+        }}>
+          <div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--slate-500)' }}>Final Score</div>
+            <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--brand-emerald, #10B981)' }}>
+              {submitResult.score} / {submitResult.max_score}
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--slate-500)' }}>Proctoring Alerts</div>
+            <div style={{ fontSize: '1.1rem', fontWeight: 700, color: focusLossCount > 3 ? '#DC2626' : 'var(--slate-700)', marginTop: '0.3rem' }}>
+              {focusLossCount > 0 ? `${focusLossCount} Focus Loss Event(s)` : 'Clean Session'}
+            </div>
+          </div>
+        </div>
+
+        <button className="btn-primary" style={{ width: '100%', justifyContent: 'center' }} onClick={() => navigate('/student')}>
+          Return to Student Dashboard <ArrowRight size={18} />
+        </button>
+      </div>
+    );
+  }
+
   if (error) {
     return (
       <div className="dash-card span-12" style={{ textAlign: 'center', maxWidth: '540px', margin: '3rem auto' }}>
         <AlertCircle size={48} color="#DC2626" style={{ margin: '0 auto 1rem auto' }} />
-        <h2>Evaluation Error</h2>
+        <h2 style={{ color: 'var(--slate-900)', marginBottom: '0.5rem' }}>Evaluation Notice</h2>
         <p style={{ color: 'var(--slate-600)', marginBottom: '1.5rem' }}>{error}</p>
-        <button className="btn-primary" onClick={() => navigate('/student')}>Go Back to Portal</button>
+        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+          <button className="btn-secondary" onClick={() => navigate('/student')}>Go to Dashboard</button>
+          <button className="btn-primary" onClick={() => submitTest(responses)}>Retry Submission</button>
+        </div>
       </div>
     );
   }
@@ -146,20 +274,35 @@ export default function AptitudeTest() {
   const progressPercent = Math.round(((currentQuestionIndex + 1) / session.questions.length) * 100);
 
   return (
-    <div style={{ maxWidth: '840px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+    <div style={{ maxWidth: '880px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
       
       {/* Test Progress & Timer Header */}
-      <div className="glass-panel" style={{ padding: '1.25rem 1.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="glass-panel" style={{ padding: '1rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <span className="badge badge-emerald">Live Aptitude Evaluation</span>
-            {focusLossCount > 0 && (
-              <span className="badge badge-orange">
-                <ShieldAlert size={12} /> Focus Lost: {focusLossCount}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+            <span className="badge badge-emerald">Proctored Aptitude Test</span>
+            
+            {focusLossCount > 0 ? (
+              <span className="badge badge-orange" style={{ background: '#FEF2F2', color: '#DC2626', border: '1px solid #FCA5A5' }}>
+                <ShieldAlert size={13} /> Focus Lost: {focusLossCount}
+              </span>
+            ) : (
+              <span className="badge badge-slate">
+                <Check size={13} /> Focus Normal
               </span>
             )}
+
+            {!isFullscreen && (
+              <button 
+                onClick={requestFullscreen} 
+                className="badge badge-sky" 
+                style={{ cursor: 'pointer', border: '1px solid #BAE6FD', background: '#F0F9FF' }}
+              >
+                <Maximize2 size={12} /> Enter Fullscreen
+              </button>
+            )}
           </div>
-          <h1 style={{ fontSize: '1.2rem', color: 'var(--slate-900)', marginTop: '0.25rem' }}>
+          <h1 style={{ fontSize: '1.15rem', color: 'var(--slate-900)', marginTop: '0.35rem', margin: 0 }}>
             Question {currentQuestionIndex + 1} of {session.questions.length}
           </h1>
         </div>
@@ -175,21 +318,53 @@ export default function AptitudeTest() {
         <div style={{ width: `${progressPercent}%`, height: '100%', background: 'var(--brand-emerald)', transition: 'width 0.3s ease' }} />
       </div>
 
+      {/* Question Number Quick Selector Grid */}
+      <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', alignItems: 'center' }}>
+        <span style={{ fontSize: '0.78rem', color: 'var(--slate-500)', marginRight: '0.4rem', fontWeight: 600 }}>Questions:</span>
+        {session.questions.map((q, idx) => {
+          const isAnswered = responses[q._id] !== undefined && responses[q._id] !== '';
+          const isCurrent = idx === currentQuestionIndex;
+          return (
+            <button
+              key={q._id || idx}
+              onClick={() => setCurrentQuestionIndex(idx)}
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '8px',
+                border: isCurrent ? '2px solid var(--brand-emerald)' : '1px solid var(--slate-200)',
+                background: isCurrent ? 'var(--brand-emerald-light)' : (isAnswered ? '#ECFDF5' : '#FFFFFF'),
+                color: isCurrent ? 'var(--brand-emerald-dark)' : (isAnswered ? '#047857' : 'var(--slate-600)'),
+                fontWeight: isCurrent || isAnswered ? 700 : 500,
+                fontSize: '0.82rem',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              {idx + 1}
+            </button>
+          );
+        })}
+      </div>
+
       {/* Main Question Card */}
-      <div className="dash-card" style={{ padding: '2.5rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+      <div className="dash-card" style={{ padding: '2rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', alignItems: 'center' }}>
           <span className="badge badge-violet">
             Category: {currentQuestion.category || 'General Aptitude'}
           </span>
+          <span style={{ fontSize: '0.82rem', color: 'var(--slate-400)' }}>
+            {currentQuestion.format === 'MCQ' ? 'Multiple Choice' : 'Structured Response'}
+          </span>
         </div>
 
-        <h2 style={{ fontSize: '1.35rem', color: 'var(--slate-900)', marginBottom: '2rem', lineHeight: 1.4, fontWeight: 700 }}>
+        <h2 style={{ fontSize: '1.25rem', color: 'var(--slate-900)', marginBottom: '1.75rem', lineHeight: 1.45, fontWeight: 700 }}>
           {currentQuestion.text}
         </h2>
 
         {/* Options / Text Input */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-          {currentQuestion.format === 'MCQ' ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          {currentQuestion.format === 'MCQ' && currentQuestion.options ? (
             currentQuestion.options.map((opt, idx) => {
               const isSelected = responses[currentQuestion._id] === idx;
               return (
@@ -200,16 +375,16 @@ export default function AptitudeTest() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    padding: '1.1rem 1.4rem',
+                    padding: '1rem 1.25rem',
                     border: isSelected ? '2px solid var(--brand-emerald)' : '1px solid var(--slate-200)',
                     borderRadius: 'var(--radius-md)',
                     background: isSelected ? 'var(--brand-emerald-light)' : '#FFFFFF',
                     color: isSelected ? 'var(--brand-emerald-dark)' : 'var(--slate-800)',
-                    fontSize: '1rem',
+                    fontSize: '0.95rem',
                     fontWeight: isSelected ? 600 : 400,
                     textAlign: 'left',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease',
+                    transition: 'all 0.15s ease',
                   }}
                 >
                   <span>{opt}</span>
@@ -221,10 +396,10 @@ export default function AptitudeTest() {
             <textarea
               value={responses[currentQuestion._id] || ''}
               onChange={(e) => handleOptionSelect(currentQuestion._id, e.target.value)}
-              placeholder="Type your structured answer here..."
-              rows={currentQuestion.format === 'essay' ? 8 : 4}
+              placeholder="Type your answer here..."
+              rows={6}
               className="form-input"
-              style={{ fontSize: '1rem', resize: 'vertical' }}
+              style={{ fontSize: '0.95rem', resize: 'vertical', width: '100%', padding: '0.85rem' }}
             />
           )}
         </div>
