@@ -21,7 +21,7 @@ import {
 import { Link } from 'react-router-dom';
 import { useState, useEffect, useMemo } from 'react';
 import { api } from '../../api/client';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Cell } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import ConsentModal from '../../components/ConsentModal';
 import PISegmentCard from '../../components/PISegmentCard';
 
@@ -103,11 +103,11 @@ export default function StudentDashboard() {
           }
         ],
         aptitudeStats: {
-          'Logic': 0.92,
-          'Math': 0.88,
-          'Verbal': 0.90,
-          'Spatial': 0.95,
-          'Problem': 0.89
+          'Logic': 0.62,
+          'Math': 0.58,
+          'Verbal': 0.65,
+          'Spatial': 0.60,
+          'Problem': 0.55
         }
       });
       
@@ -164,7 +164,7 @@ export default function StudentDashboard() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1.5rem', marginBottom: '0.5rem' }}>
         <div>
           <h1 style={{ fontSize: '2rem', color: '#0F172A', marginBottom: '0.35rem', fontWeight: 800 }}>
-            Welcome back, {firstName} 👋
+            Welcome back, {firstName}
           </h1>
           <p style={{ color: '#64748B', fontSize: '1rem' }}>
             Here is what's happening in your evaluation zone today.
@@ -259,20 +259,22 @@ export default function StudentDashboard() {
           <div style={{ height: '280px', width: '100%', marginTop: '1rem' }}>
             {barData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={barData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <AreaChart data={barData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#0F172A" stopOpacity={0.2}/>
+                      <stop offset="95%" stopColor="#0F172A" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
                   <XAxis dataKey="subject" axisLine={false} tickLine={false} tick={{ fill: '#94A3B8', fontSize: 12 }} dy={10} />
                   <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94A3B8', fontSize: 12 }} />
                   <RechartsTooltip 
-                    cursor={{ fill: '#F8FAFC' }}
+                    cursor={{ stroke: '#F8FAFC', strokeWidth: 2 }}
                     contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
                   />
-                  <Bar dataKey="score" radius={[4, 4, 0, 0]} barSize={40}>
-                    {barData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#0F172A' : '#E2E8F0'} />
-                    ))}
-                  </Bar>
-                </BarChart>
+                  <Area type="monotone" dataKey="score" stroke="#0F172A" strokeWidth={3} fillOpacity={1} fill="url(#colorScore)" />
+                </AreaChart>
               </ResponsiveContainer>
             ) : (
                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#94A3B8' }}>
