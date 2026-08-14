@@ -86,7 +86,7 @@ export default function StaffLogin() {
         
         <div className="auth-header" style={{ marginBottom: '1.25rem' }}>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.75rem' }}>
-            <img src="/logo.png" alt="EduGuide Logo" style={{ width: '72px', height: '72px', objectFit: 'contain' }} />
+            <img src="/logo.png" alt="EduGuide Logo" style={{ width: '84px', height: '84px', objectFit: 'contain' }} />
           </div>
           <h1 className="auth-title" style={{ fontSize: '1.65rem' }}>Staff Workspace</h1>
           <p className="auth-subtitle">Select role tab to sign in</p>

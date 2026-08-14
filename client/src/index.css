@@ -6,37 +6,43 @@
 :root {
   /* Core Base Colors */
   --bg-primary: #FFFFFF;
-  --bg-secondary: #F8FAFC;
-  --bg-ambient: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 35%, #EFF6FF 70%, #F0F9FF 100%);
+  --bg-secondary: #FAFBFC;
+  --bg-ambient: #FAFBFC; /* Solid clean off-white */
   
-  /* Primary Brand Accent (Ocean Blue / Royal Indigo) */
-  --brand-blue: #2563EB;
-  --brand-blue-hover: #1D4ED8;
-  --brand-blue-dark: #1E3A8A;
-  --brand-blue-light: #EFF6FF;
-  --brand-blue-border: rgba(37, 99, 235, 0.25);
-  --brand-blue-glow: rgba(37, 99, 235, 0.15);
+  /* Primary Brand Accent (Deep Navy & Lavender for active states) */
+  --brand-navy: #0F172A;
+  --brand-navy-hover: #1E293B;
+
+  --brand-active-bg: #EEF2FF;
+  --brand-active-text: #4F46E5;
 
   /* Legacy Mapping for Smooth Compatibility */
-  --brand-emerald: #2563EB;
-  --brand-emerald-hover: #1D4ED8;
-  --brand-emerald-dark: #1E3A8A;
-  --brand-emerald-light: #EFF6FF;
-  --brand-emerald-border: rgba(37, 99, 235, 0.25);
-  --brand-emerald-glow: rgba(37, 99, 235, 0.15);
+  --brand-blue: #4F46E5;
+  --brand-blue-hover: #4338CA;
+  --brand-blue-dark: #3730A3;
+  --brand-blue-light: #EEF2FF;
+  --brand-blue-border: rgba(79, 70, 229, 0.25);
+  --brand-blue-glow: rgba(79, 70, 229, 0.15);
+
+  --brand-emerald: #4F46E5;
+  --brand-emerald-hover: #4338CA;
+  --brand-emerald-dark: #3730A3;
+  --brand-emerald-light: #EEF2FF;
+  --brand-emerald-border: rgba(79, 70, 229, 0.25);
+  --brand-emerald-glow: rgba(79, 70, 229, 0.15);
 
   /* Secondary Accent Colors */
   --accent-violet: #6366F1;
   --accent-violet-light: #EEF2FF;
   --accent-violet-border: rgba(99, 102, 241, 0.25);
 
-  --accent-amber: #D97706;
-  --accent-amber-light: #FFFBEB;
-  --accent-amber-border: rgba(217, 119, 6, 0.25);
+  --accent-amber: #F59E0B;
+  --accent-amber-light: #FEF3C7;
+  --accent-amber-border: rgba(245, 158, 11, 0.25);
 
-  --accent-sky: #0284C7;
+  --accent-sky: #0EA5E9;
   --accent-sky-light: #E0F2FE;
-  --accent-sky-border: rgba(2, 132, 199, 0.25);
+  --accent-sky-border: rgba(14, 165, 233, 0.25);
 
   --accent-indigo: #4F46E5;
   --accent-indigo-light: #EEF2FF;
@@ -54,14 +60,14 @@
   --slate-100: #F1F5F9;
   --slate-50:  #F8FAFC;
 
-  /* Glassmorphism Tokens */
-  --glass-bg: rgba(255, 255, 255, 0.82);
-  --glass-bg-dense: rgba(255, 255, 255, 0.92);
-  --glass-border: 1px solid rgba(226, 232, 240, 0.8);
-  --glass-border-subtle: 1px solid rgba(37, 99, 235, 0.08);
-  --glass-shadow: 0 10px 30px -5px rgba(37, 99, 235, 0.05), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
-  --glass-shadow-hover: 0 20px 40px -10px rgba(37, 99, 235, 0.15), 0 8px 16px -4px rgba(15, 23, 42, 0.05);
-  --glass-blur: blur(16px) saturate(180%);
+  /* Glassmorphism Tokens (Flattened for Minimal Look) */
+  --glass-bg: #FFFFFF;
+  --glass-bg-dense: #FFFFFF;
+  --glass-border: 1px solid #FFFFFF;
+  --glass-border-subtle: 1px solid #F8FAFC;
+  --glass-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.03), 0 2px 8px -2px rgba(15, 23, 42, 0.02);
+  --glass-shadow-hover: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
+  --glass-blur: none;
 
   /* Border Radii */
   --radius-sm: 8px;
@@ -208,7 +214,7 @@ button, input, select, textarea {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+  background: var(--brand-navy);
   color: #FFFFFF;
   font-weight: 600;
   font-size: 0.9rem;
@@ -216,14 +222,14 @@ button, input, select, textarea {
   border-radius: var(--radius-md);
   border: none;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.15);
   transition: all 0.2s ease-in-out;
 }
 
 .btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.38);
-  background: linear-gradient(135deg, #1D4ED8 0%, #1E3A8A 100%);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.25);
+  background: var(--brand-navy-hover);
 }
 
 .btn-primary:active {

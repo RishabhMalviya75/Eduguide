@@ -12,12 +12,16 @@ import {
   User, 
   Sparkles, 
   CheckCircle2, 
-  Loader2 
+  Users,
+  BookOpen,
+  ClipboardList,
+  Star,
+  BarChart3
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useState, useEffect, useMemo } from 'react';
 import { api } from '../../api/client';
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Cell } from 'recharts';
 import ConsentModal from '../../components/ConsentModal';
 import PISegmentCard from '../../components/PISegmentCard';
 
@@ -83,27 +87,27 @@ export default function StudentDashboard() {
             careerId: 'c1',
             title: 'Software & AI Engineer',
             matchPercentage: 96,
-            description: 'Exceptional alignment in quantitative logic, algorithmic reasoning, and problem solving.'
+            description: 'Exceptional alignment in quantitative logic and algorithmic reasoning.'
           },
           {
             careerId: 'c2',
-            title: 'Data Scientist & Analytics Specialist',
+            title: 'Data Scientist',
             matchPercentage: 91,
-            description: 'Strong mathematical aptitude combined with structured data analysis and predictive modeling.'
+            description: 'Strong mathematical aptitude combined with structured data analysis.'
           },
           {
             careerId: 'c3',
             title: 'Tech Product Manager',
             matchPercentage: 87,
-            description: 'Balanced verbal analytical skills, strategic prioritization, and system design comprehension.'
+            description: 'Balanced analytical skills and system design comprehension.'
           }
         ],
         aptitudeStats: {
-          'Logical Reasoning': 0.92,
-          'Quantitative Math': 0.88,
-          'Verbal Analysis': 0.90,
-          'Spatial Aptitude': 0.95,
-          'Problem Solving': 0.89
+          'Logic': 0.92,
+          'Math': 0.88,
+          'Verbal': 0.90,
+          'Spatial': 0.95,
+          'Problem': 0.89
         }
       });
     } else {
@@ -113,22 +117,20 @@ export default function StudentDashboard() {
     setLoading(false);
   };
 
-  // Prepare data for the radar chart
-  const radarData = useMemo(() => {
+  // Prepare data for the Bar chart
+  const barData = useMemo(() => {
     if (!insights) return [];
     
     const dataPoints = [];
     const { academicStats = {}, aptitudeStats = {} } = insights;
     
-    if (academicStats && Object.keys(academicStats).length > 0) {
-      Object.entries(academicStats).forEach(([subject, score]) => {
-        dataPoints.push({ subject, score: Math.round(score > 1 ? score : score * 100) });
-      });
-    }
-    
     if (aptitudeStats && Object.keys(aptitudeStats).length > 0) {
       Object.entries(aptitudeStats).forEach(([skill, score]) => {
         dataPoints.push({ subject: skill, score: Math.round(score > 1 ? score : score * 100) });
+      });
+    } else if (academicStats && Object.keys(academicStats).length > 0) {
+      Object.entries(academicStats).forEach(([subject, score]) => {
+        dataPoints.push({ subject, score: Math.round(score > 1 ? score : score * 100) });
       });
     }
     
@@ -136,9 +138,12 @@ export default function StudentDashboard() {
   }, [insights]);
 
   const studentId = user?.id || user?._id;
+  const firstName = user?.name ? user.name.split(' ')[0] : 'Student';
+  const latestScore = history.length > 0 ? history[0].score : 0;
+  const avgMatch = insights?.matches?.[0]?.matchPercentage || 0;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', paddingBottom: '2rem' }}>
       {needsConsent && studentId && (
         <ConsentModal 
           studentId={studentId} 
@@ -146,156 +151,177 @@ export default function StudentDashboard() {
         />
       )}
 
-      {/* Hero Welcome Banner - Sky Blue Gradient */}
-      <div className="dash-card span-12" style={{ 
-        background: 'linear-gradient(135deg, #FFFFFF 0%, #F0F9FF 50%, #E0F2FE 100%)',
-        border: '1px solid #BAE6FD',
-        borderRadius: '20px',
-        padding: '1.75rem 2rem',
-        position: 'relative',
-        boxShadow: '0 8px 24px -4px rgba(37, 99, 235, 0.08)'
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 2, flexWrap: 'wrap', gap: '1.25rem' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-              <span className="badge badge-blue" style={{ fontWeight: 700 }}>
-                Grade {user?.grade || '10'}-{user?.section || 'A'}
-              </span>
-              <span className="badge badge-slate">Roll No: {user?.roll_no}</span>
-              <span className="badge badge-emerald">
-                <CheckCircle2 size={12} /> Active Student
-              </span>
-            </div>
-            <h1 style={{ fontSize: '1.85rem', color: '#0F172A', marginBottom: '0.35rem', fontWeight: 800 }}>
-              Welcome back, {user?.name ? user.name.split(' ')[0] : 'Student'} 👋
-            </h1>
-            <p style={{ color: '#475569', fontSize: '0.95rem', maxWidth: '640px' }}>
-              Your Career Fit Zone integrates academic performance, proctored cognitive aptitude scores, and counselor PI observations.
-            </p>
-          </div>
+      {/* Minimal Header Section */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1.5rem', marginBottom: '0.5rem' }}>
+        <div>
+          <h1 style={{ fontSize: '2rem', color: '#0F172A', marginBottom: '0.35rem', fontWeight: 800 }}>
+            Welcome back, {firstName} 👋
+          </h1>
+          <p style={{ color: '#64748B', fontSize: '1rem' }}>
+            Here is what's happening in your evaluation zone today.
+          </p>
+        </div>
+        <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <Link to={`/student/report/${studentId}`} className="btn-secondary">
+            <FileText size={16} /> Report
+          </Link>
+          <Link to="/student/test" className="btn-primary">
+             Take Assessment
+          </Link>
+        </div>
+      </div>
 
-          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <Link to="/student/profile" className="btn-secondary">
-              <User size={16} /> My Profile
-            </Link>
-            <Link to={`/student/report/${studentId}`} className="btn-secondary">
-              <FileText size={16} /> Career Report
-            </Link>
-            <Link to="/student/test" className="btn-primary" style={{ background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)', boxShadow: '0 4px 14px rgba(37, 99, 235, 0.3)' }}>
-              <BrainCircuit size={16} /> Take Aptitude Test
-            </Link>
+      {/* Top Metrics Row */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem' }}>
+        {/* Metric 1 */}
+        <div className="glass-card" style={{ padding: '1.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+            <div style={{ background: '#EEF2FF', color: '#4F46E5', padding: '0.5rem', borderRadius: '8px' }}>
+              <Users size={20} />
+            </div>
+            <span className="badge badge-indigo" style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem' }}>+2%</span>
+          </div>
+          <div style={{ fontSize: '0.75rem', color: '#64748B', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>
+            Assessments Taken
+          </div>
+          <div style={{ fontSize: '2rem', fontWeight: 800, color: '#0F172A', lineHeight: 1 }}>
+            {history.length}
+          </div>
+        </div>
+
+        {/* Metric 2 */}
+        <div className="glass-card" style={{ padding: '1.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+            <div style={{ background: '#F5F3FF', color: '#7C3AED', padding: '0.5rem', borderRadius: '8px' }}>
+              <BookOpen size={20} />
+            </div>
+          </div>
+          <div style={{ fontSize: '0.75rem', color: '#64748B', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>
+            Active Courses
+          </div>
+          <div style={{ fontSize: '2rem', fontWeight: 800, color: '#0F172A', lineHeight: 1 }}>
+            6
+          </div>
+        </div>
+
+        {/* Metric 3 */}
+        <div className="glass-card" style={{ padding: '1.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+            <div style={{ background: '#F0FDF4', color: '#16A34A', padding: '0.5rem', borderRadius: '8px' }}>
+              <ClipboardList size={20} />
+            </div>
+            <span style={{ fontSize: '0.75rem', color: '#64748B', fontWeight: 500 }}>Pending: 0</span>
+          </div>
+          <div style={{ fontSize: '0.75rem', color: '#64748B', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>
+            Latest Score
+          </div>
+          <div style={{ fontSize: '2rem', fontWeight: 800, color: '#0F172A', lineHeight: 1 }}>
+            {latestScore > 0 ? `${latestScore}` : '--'}
+          </div>
+        </div>
+
+        {/* Metric 4 */}
+        <div className="glass-card" style={{ padding: '1.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+            <div style={{ background: '#FFFBEB', color: '#D97706', padding: '0.5rem', borderRadius: '8px' }}>
+              <Star size={20} />
+            </div>
+            <span className="badge badge-amber" style={{ fontSize: '0.7rem', padding: '0.2rem 0.5rem' }}>High</span>
+          </div>
+          <div style={{ fontSize: '0.75rem', color: '#64748B', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>
+            Avg Match Fit
+          </div>
+          <div style={{ fontSize: '2rem', fontWeight: 800, color: '#0F172A', lineHeight: 1 }}>
+            {avgMatch > 0 ? `${avgMatch}%` : '--'}
           </div>
         </div>
       </div>
 
-      {/* Bento Grid Layout */}
+      {/* Main Grid Layout */}
       <div className="bento-grid">
         
-        {/* Card 1: AI Top Recommended Career Matches */}
-        <div className="dash-card span-8" style={{
-          background: '#FFFFFF',
-          borderRadius: '16px',
-          border: '1px solid #E2E8F0',
-          padding: '1.5rem'
-        }}>
+        {/* Bar Chart Section */}
+        <div className="dash-card span-8" style={{ padding: '1.75rem' }}>
           <div className="card-header-row">
-            <div className="card-title-group">
-              <div className="card-icon-badge" style={{ background: '#EFF6FF', color: '#2563EB' }}>
-                <Zap size={22} />
-              </div>
-              <div>
-                <div className="card-title-text">AI Recommended Career Fits</div>
-                <div className="card-subtitle-text">Synthesized from Academic Marks + Cognitive Aptitude</div>
-              </div>
-            </div>
-            <span className="badge badge-blue">Real-time Synthesis</span>
+            <div className="card-title-text" style={{ fontSize: '1.25rem' }}>Cognitive Engagement</div>
+            <span className="badge badge-slate" style={{ fontSize: '0.75rem' }}>This Week</span>
           </div>
 
-          {loading ? (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '3rem', color: '#2563EB' }}>
-              <Loader2 size={28} className="animate-spin" />
-            </div>
-          ) : insights && insights.matches && insights.matches.length > 0 ? (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '1rem', marginTop: '0.5rem' }}>
-              {insights.matches.slice(0, 3).map((match, idx) => (
-                <div 
-                  key={match.careerId || idx} 
-                  className="glass-card" 
-                  style={{ 
-                    padding: '1.25rem',
-                    borderRadius: '14px',
-                    border: idx === 0 ? '1px solid #BAE6FD' : '1px solid #E2E8F0',
-                    background: idx === 0 ? 'linear-gradient(135deg, #FFFFFF 0%, #F0F9FF 100%)' : '#FFFFFF'
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.6rem' }}>
-                    <h3 style={{ fontSize: '1rem', color: '#0F172A', margin: 0, fontWeight: 700 }}>{match.title}</h3>
-                    <span className={idx === 0 ? 'badge badge-blue' : 'badge badge-slate'} style={{ fontWeight: 700, fontSize: '0.8rem' }}>
-                      {match.matchPercentage}% Match
-                    </span>
-                  </div>
-                  <p style={{ fontSize: '0.82rem', color: '#64748B', lineHeight: 1.45 }}>
-                    {match.description || 'Strong alignment across core cognitive reasoning and relevant academic subjects.'}
-                  </p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div style={{
-              padding: '2rem',
-              textAlign: 'center',
-              background: '#F8FAFC',
-              borderRadius: '12px',
-              border: '1px dashed #CBD5E1',
-              color: '#64748B',
-              marginTop: '0.5rem'
-            }}>
-              <BrainCircuit size={32} style={{ margin: '0 auto 0.5rem auto', color: '#94A3B8' }} />
-              <div style={{ fontWeight: 600, fontSize: '0.92rem', color: '#334155' }}>No Career Matches Generated Yet</div>
-              <p style={{ fontSize: '0.82rem', marginTop: '0.2rem', maxWidth: '480px', margin: '0.2rem auto 0 auto' }}>
-                Complete an aptitude test and ensure your class marks are uploaded to compute your Career Fit Zone.
-              </p>
-              <Link to="/student/test" className="btn-primary" style={{ marginTop: '1rem', background: '#2563EB', fontSize: '0.85rem' }}>
-                Start Aptitude Evaluation <ArrowRight size={14} />
-              </Link>
-            </div>
-          )}
-        </div>
-
-        {/* Card 2: Interactive Skill Radar Chart */}
-        <div className="dash-card span-4" style={{
-          background: '#FFFFFF',
-          borderRadius: '16px',
-          border: '1px solid #E2E8F0',
-          padding: '1.5rem'
-        }}>
-          <div className="card-header-row">
-            <div className="card-title-group">
-              <div className="card-icon-badge" style={{ background: '#EFF6FF', color: '#2563EB' }}>
-                <TrendingUp size={22} />
-              </div>
-              <div>
-                <div className="card-title-text">Skill Radar</div>
-                <div className="card-subtitle-text">Academic & Aptitude Profile</div>
-              </div>
-            </div>
-          </div>
-
-          <div style={{ height: '230px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {radarData.length > 0 ? (
+          <div style={{ height: '280px', width: '100%', marginTop: '1rem' }}>
+            {barData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
-                  <PolarGrid stroke="#E2E8F0" />
-                  <PolarAngleAxis dataKey="subject" tick={{ fill: '#475569', fontSize: 10, fontWeight: 600 }} />
-                  <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
-                  <Radar name="Score" dataKey="score" stroke="#2563EB" fill="#2563EB" fillOpacity={0.35} />
-                  <Tooltip />
-                </RadarChart>
+                <BarChart data={barData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
+                  <XAxis dataKey="subject" axisLine={false} tickLine={false} tick={{ fill: '#94A3B8', fontSize: 12 }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94A3B8', fontSize: 12 }} />
+                  <RechartsTooltip 
+                    cursor={{ fill: '#F8FAFC' }}
+                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
+                  />
+                  <Bar dataKey="score" radius={[4, 4, 0, 0]} barSize={40}>
+                    {barData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#0F172A' : '#E2E8F0'} />
+                    ))}
+                  </Bar>
+                </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div style={{ textAlign: 'center', color: '#94A3B8', fontSize: '0.85rem' }}>
-                <Sparkles size={24} style={{ margin: '0 auto 0.4rem auto', color: '#CBD5E1' }} />
-                <div>Radar chart populates after first test evaluation.</div>
+               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#94A3B8' }}>
+                <BarChart3 size={32} style={{ marginBottom: '0.75rem', opacity: 0.5 }} />
+                <div style={{ fontSize: '0.9rem' }}>No engagement data available yet.</div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Circular Progress & Matches Section */}
+        <div className="dash-card span-4" style={{ padding: '1.75rem' }}>
+          <div className="card-header-row">
+            <div className="card-title-text" style={{ fontSize: '1.25rem' }}>Top Career Fits</div>
+          </div>
+          
+          {/* SVG Circular Progress Ring */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '2rem', padding: '1rem 0' }}>
+            <div style={{ position: 'relative', width: '90px', height: '90px' }}>
+              <svg width="90" height="90" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#F1F5F9" strokeWidth="8" />
+                <circle 
+                  cx="50" cy="50" r="40" 
+                  fill="none" 
+                  stroke="#4F46E5" 
+                  strokeWidth="8" 
+                  strokeDasharray={`${avgMatch > 0 ? (avgMatch / 100) * 251 : 0} 251`}
+                  strokeLinecap="round"
+                  transform="rotate(-90 50 50)"
+                  style={{ transition: 'stroke-dasharray 1s ease-out' }}
+                />
+              </svg>
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+                <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0F172A', lineHeight: 1 }}>{avgMatch > 0 ? `${avgMatch}%` : '0%'}</span>
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0F172A' }}>Primary Match</div>
+              <div style={{ fontSize: '0.8rem', color: '#64748B' }}>Based on recent test</div>
+            </div>
+          </div>
+
+          {/* List of Matches */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {insights?.matches?.slice(0, 3).map((match, idx) => (
+              <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '1rem', borderBottom: idx !== 2 ? '1px solid #F1F5F9' : 'none' }}>
+                <div>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 600, color: '#0F172A' }}>{match.title}</div>
+                  <div style={{ fontSize: '0.75rem', color: '#64748B' }}>Alignment Score</div>
+                </div>
+                <div style={{ fontWeight: 700, color: idx === 0 ? '#10B981' : '#F59E0B', fontSize: '0.95rem' }}>
+                  {match.matchPercentage}%
+                </div>
+              </div>
+            ))}
+            {(!insights || !insights.matches || insights.matches.length === 0) && (
+              <div style={{ textAlign: 'center', padding: '1rem', color: '#94A3B8', fontSize: '0.85rem' }}>
+                Take the assessment to reveal your career matches.
               </div>
             )}
           </div>
@@ -303,59 +329,6 @@ export default function StudentDashboard() {
 
         {/* Card 3: Counselor PI Segment */}
         <PISegmentCard studentId={studentId} />
-
-        {/* Card 4: Test Session History */}
-        <div className="dash-card span-6" style={{
-          background: '#FFFFFF',
-          borderRadius: '16px',
-          border: '1px solid #E2E8F0',
-          padding: '1.5rem'
-        }}>
-          <div className="card-header-row">
-            <div className="card-title-group">
-              <div className="card-icon-badge" style={{ background: '#EFF6FF', color: '#2563EB' }}>
-                <BrainCircuit size={22} />
-              </div>
-              <div>
-                <div className="card-title-text">Test Session Log</div>
-                <div className="card-subtitle-text">Proctored Aptitude Evaluations</div>
-              </div>
-            </div>
-            <Link to="/student/test" className="badge badge-blue" style={{ cursor: 'pointer' }}>
-              <span>New Session</span>
-              <ArrowRight size={12} />
-            </Link>
-          </div>
-
-          {history.length > 0 ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
-              {history.slice(0, 4).map(test => (
-                <div key={test._id} className="glass-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.85rem 1.1rem', borderRadius: '10px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                    <div style={{ padding: '0.45rem', background: '#EFF6FF', color: '#1E40AF', borderRadius: '8px' }}>
-                      <Award size={18} />
-                    </div>
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: '0.92rem', color: '#0F172A' }}>
-                        Score: {test.score} / {test.max_score || 100}
-                      </div>
-                      <div style={{ fontSize: '0.76rem', color: '#64748B', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                        <Calendar size={12} />
-                        {new Date(test.completed_at || test.createdAt || Date.now()).toLocaleDateString()}
-                      </div>
-                    </div>
-                  </div>
-                  <span className="badge badge-blue" style={{ fontSize: '0.75rem' }}>Completed</span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div style={{ padding: '1.5rem', textAlign: 'center', color: '#64748B', background: '#F8FAFC', borderRadius: '10px', border: '1px dashed #CBD5E1' }}>
-              <div style={{ fontWeight: 600, fontSize: '0.88rem', color: '#334155' }}>No Evaluation History</div>
-              <div style={{ fontSize: '0.8rem', marginTop: '0.2rem' }}>You have not completed any proctored aptitude tests yet.</div>
-            </div>
-          )}
-        </div>
 
       </div>
     </div>

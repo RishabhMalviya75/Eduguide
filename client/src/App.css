@@ -12,10 +12,8 @@
 /* Left-hand Vertical Sidebar */
 .app-sidebar {
   width: 260px;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-right: 1px solid rgba(226, 232, 240, 0.8);
+  background: #FFFFFF;
+  border-right: 1px solid var(--slate-100);
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -38,12 +36,12 @@
   width: 40px;
   height: 40px;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--brand-emerald) 0%, var(--brand-emerald-hover) 100%);
+  background: var(--brand-navy);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #FFFFFF;
-  box-shadow: 0 4px 12px var(--brand-emerald-glow);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
 }
 
 .sidebar-logo-text {
@@ -57,8 +55,8 @@
 .sidebar-logo-tag {
   font-size: 0.65rem;
   font-weight: 700;
-  background: var(--brand-emerald-light);
-  color: var(--brand-emerald-dark);
+  background: var(--brand-active-bg);
+  color: var(--brand-active-text);
   padding: 0.15rem 0.4rem;
   border-radius: 4px;
   margin-left: 0.25rem;
@@ -87,33 +85,21 @@
   gap: 0.85rem;
   padding: 0.75rem 1rem;
   border-radius: var(--radius-md);
-  color: var(--slate-600);
+  color: var(--slate-500);
   font-weight: 500;
   font-size: 0.92rem;
   transition: all 0.2s ease;
 }
 
 .sidebar-nav-item:hover {
-  color: var(--slate-900);
-  background: var(--slate-100);
+  color: var(--slate-800);
+  background: var(--slate-50);
 }
 
 .sidebar-nav-item.active {
-  color: var(--brand-emerald-dark);
-  background: var(--brand-emerald-light);
+  color: var(--brand-active-text);
+  background: var(--brand-active-bg);
   font-weight: 600;
-}
-
-/* Thin Active Indicator Pill Bar (Emerald Green) */
-.sidebar-nav-item.active::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 15%;
-  bottom: 15%;
-  width: 4px;
-  background: var(--brand-emerald);
-  border-radius: 0 4px 4px 0;
 }
 
 .sidebar-user-footer {
@@ -157,10 +143,8 @@
 /* Top Header Bar */
 .app-top-header {
   height: 72px;
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+  background: #FFFFFF;
+  border-bottom: 1px solid var(--slate-100);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -183,8 +167,8 @@
 }
 
 .header-search:focus-within {
-  border-color: var(--brand-emerald);
-  box-shadow: 0 0 0 3px var(--brand-emerald-glow);
+  border-color: var(--brand-active-text);
+  box-shadow: 0 0 0 3px var(--brand-active-bg);
 }
 
 .header-search input {

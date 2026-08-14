@@ -18,7 +18,7 @@ export default function RoleSelection() {
         
         <div className="auth-header" style={{ marginBottom: '1.75rem' }}>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
-            <img src="/logo.png" alt="EduGuide Logo" style={{ width: '84px', height: '84px', objectFit: 'contain' }} />
+            <img src="/logo.png" alt="EduGuide Logo" style={{ width: '96px', height: '96px', objectFit: 'contain' }} />
           </div>
           <h1 className="auth-title" style={{ fontSize: '1.85rem' }}>Welcome to EduGuide AI</h1>
           <p className="auth-subtitle">Select your portal to access holistic evaluation & career analytics</p>
@@ -99,7 +99,7 @@ export default function RoleSelection() {
               </button>
 
               <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-                <img src="/logo.png" alt="EduGuide" style={{ width: '56px', height: '56px', margin: '0 auto 0.75rem auto', objectFit: 'contain' }} />
+                <img src="/logo.png" alt="EduGuide" style={{ width: '64px', height: '64px', margin: '0 auto 0.75rem auto', objectFit: 'contain' }} />
                 <h2 style={{ fontSize: '1.35rem', color: '#0F172A' }}>Select Your Staff Role</h2>
                 <p style={{ fontSize: '0.85rem', color: '#64748B', marginTop: '0.25rem' }}>
                   Choose your role to access your dedicated workspace

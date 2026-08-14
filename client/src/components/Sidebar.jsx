@@ -25,7 +25,7 @@ export default function Sidebar() {
     <aside className="app-sidebar">
       {/* Branded Header Logo */}
       <div className="sidebar-logo">
-        <img src="/logo.png" alt="EduGuide Logo" style={{ width: '48px', height: '48px', objectFit: 'contain' }} />
+        <img src="/logo.png" alt="EduGuide Logo" style={{ width: '64px', height: '64px', objectFit: 'contain' }} />
         <div>
           <div className="sidebar-logo-text">EduGuide <span className="sidebar-logo-tag">AI</span></div>
         </div>
