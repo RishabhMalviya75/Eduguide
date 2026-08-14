@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { ShieldCheck } from 'lucide-react';
 import { api } from '../api/client';
+import { useAuth } from '../context/AuthContext';
 
 export default function ConsentModal({ studentId, onConsentGranted }) {
+  const { updateConsent, logout } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -12,13 +14,20 @@ export default function ConsentModal({ studentId, onConsentGranted }) {
     try {
       const res = await api.put(`/students/${studentId}/consent`);
       if (res.success) {
+        if (updateConsent) updateConsent();
         onConsentGranted();
+      } else {
+        setError(res.error || 'Failed to record consent. Please try again.');
       }
     } catch (err) {
-      setError('Failed to record consent. Please try again.');
+      setError(err.message || 'Failed to record consent. Please try again.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDecline = () => {
+    logout();
   };
 
   return (
@@ -54,7 +63,7 @@ export default function ConsentModal({ studentId, onConsentGranted }) {
           <button 
             className="btn-secondary" 
             style={{ flex: 1 }}
-            onClick={() => window.location.href = '/'}
+            onClick={handleDecline}
             disabled={loading}
           >
             Decline & Logout

@@ -16,15 +16,34 @@ export default function StaffLogin() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+
+    if (!password) {
+      setError('Please enter your password.');
+      return;
+    }
+
     setLoading(true);
 
-    const result = await loginStaff(email, password);
+    try {
+      const result = await loginStaff(email, password);
 
-    if (result.success) {
-      if (result.user.role === 'Admin') navigate('/admin');
-      else navigate('/teacher'); // Unified staff portal
-    } else {
-      setError(result.error);
+      if (result.success) {
+        if (result.user.role === 'Admin') navigate('/admin');
+        else if (result.user.role === 'Teacher') navigate('/teacher');
+        else if (result.user.role === 'Counselor') navigate('/counselor');
+        else navigate('/teacher');
+      } else {
+        setError(result.error || 'Invalid email or password.');
+        setLoading(false);
+      }
+    } catch (err) {
+      setError(err.message || 'An error occurred during sign in.');
       setLoading(false);
     }
   };

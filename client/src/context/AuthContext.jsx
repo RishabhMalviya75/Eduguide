@@ -87,11 +87,12 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const logout = () => {
-    setToken(null);
-    setUser(null);
-    localStorage.removeItem('eduguide_token');
-    localStorage.removeItem('eduguide_user');
+  const updateConsent = () => {
+    if (user) {
+      const updatedUser = { ...user, consent_flag: true };
+      setUser(updatedUser);
+      localStorage.setItem('eduguide_user', JSON.stringify(updatedUser));
+    }
   };
 
   return (
@@ -103,7 +104,8 @@ export function AuthProvider({ children }) {
       verifyStudentIdentity,
       setStudentPin,
       loginStudent,
-      logout
+      logout,
+      updateConsent
     }}>
       {children}
     </AuthContext.Provider>
