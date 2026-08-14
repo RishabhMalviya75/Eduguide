@@ -12,6 +12,7 @@ import MarksUpload from './views/teacher/MarksUpload';
 import StudentDashboard from './views/student/StudentDashboard';
 import StudentReport from './views/student/StudentReport';
 import AptitudeTest from './views/student/AptitudeTest';
+import StudentProfile from './views/student/StudentProfile';
 import ReviewQueue from './views/staff/ReviewQueue';
 import CounselorDashboard from './views/counselor/CounselorDashboard';
 
@@ -25,15 +26,16 @@ export default function AppRoutes() {
         path="/" 
         element={
           user ? (
-            user.role === 'Admin' ? <Navigate to="/admin" /> :
-            (user.role === 'Teacher' || user.role === 'Counselor') ? <Navigate to="/teacher" /> :
-            <Navigate to="/student" />
+            user.role === 'Admin' ? <Navigate to="/admin" replace /> :
+            user.role === 'Counselor' ? <Navigate to="/counselor" replace /> :
+            user.role === 'Teacher' ? <Navigate to="/teacher" replace /> :
+            <Navigate to="/student" replace />
           ) : <RoleSelection />
         } 
       />
       
-      <Route path="/login/staff" element={<StaffLogin />} />
-      <Route path="/login/student" element={<StudentLogin />} />
+      <Route path="/login/staff" element={user ? <Navigate to="/" replace /> : <StaffLogin />} />
+      <Route path="/login/student" element={user ? <Navigate to="/" replace /> : <StudentLogin />} />
 
       {/* Protected Admin Routes */}
       <Route 
@@ -47,7 +49,7 @@ export default function AppRoutes() {
         } 
       />
 
-      {/* Protected Review Queue */}
+      {/* Protected Review Queue (Staff Only) */}
       <Route 
         path="/staff/review-queue" 
         element={
@@ -105,11 +107,11 @@ export default function AppRoutes() {
         } 
       />
       <Route 
-        path="/student/report/:id" 
+        path="/student/profile" 
         element={
-          <ProtectedRoute allowedRoles={['Student', 'Admin', 'Teacher', 'Counselor']}>
+          <ProtectedRoute allowedRoles={['Student']}>
             <AppLayout>
-              <StudentReport />
+              <StudentProfile />
             </AppLayout>
           </ProtectedRoute>
         } 
@@ -120,6 +122,16 @@ export default function AppRoutes() {
           <ProtectedRoute allowedRoles={['Student']}>
             <AppLayout>
               <AptitudeTest />
+            </AppLayout>
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/student/report/:id" 
+        element={
+          <ProtectedRoute allowedRoles={['Student', 'Admin', 'Teacher', 'Counselor']}>
+            <AppLayout>
+              <StudentReport />
             </AppLayout>
           </ProtectedRoute>
         } 

@@ -48,7 +48,11 @@ export default function Sidebar() {
               <Award size={20} />
               <span>Aptitude Test</span>
             </NavLink>
-            <NavLink to={`/student/report/${user.id}`} className={({ isActive }) => `sidebar-nav-item ${isActive ? 'active' : ''}`}>
+            <NavLink to="/student/profile" className={({ isActive }) => `sidebar-nav-item ${isActive ? 'active' : ''}`}>
+              <Users size={20} />
+              <span>My Profile</span>
+            </NavLink>
+            <NavLink to={`/student/report/${user.id || user._id}`} className={({ isActive }) => `sidebar-nav-item ${isActive ? 'active' : ''}`}>
               <BarChart3 size={20} />
               <span>Career Report</span>
             </NavLink>
