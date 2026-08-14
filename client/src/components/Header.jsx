@@ -1,8 +1,8 @@
 import { useAuth } from '../context/AuthContext';
-import { Search, Bell, School, Shield, Sparkles } from 'lucide-react';
+import { Search, Bell, School, Shield, Sparkles, LogOut } from 'lucide-react';
 
 export default function Header() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   if (!user) return null;
 
@@ -57,6 +57,36 @@ export default function Header() {
               background: 'var(--brand-emerald)'
             }}
           />
+        {/* User Profile Block */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginLeft: '1rem', paddingLeft: '1rem', borderLeft: '1px solid var(--slate-200)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div className="user-avatar" style={{ width: '32px', height: '32px', fontSize: '0.8rem', background: 'var(--brand-navy)', color: '#FFFFFF' }}>
+              {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--slate-900)', lineHeight: 1.1 }}>{user.name}</span>
+              <span style={{ fontSize: '0.7rem', color: 'var(--slate-500)' }}>{user.role}</span>
+            </div>
+          </div>
+          <button 
+            onClick={logout} 
+            title="Logout"
+            style={{ 
+              border: 'none', 
+              background: 'transparent', 
+              color: 'var(--slate-400)', 
+              cursor: 'pointer', 
+              padding: '0.25rem',
+              borderRadius: '6px',
+              transition: 'all 0.2s ease',
+              marginLeft: '0.25rem'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.color = '#EF4444'}
+            onMouseOut={(e) => e.currentTarget.style.color = 'var(--slate-400)'}
+          >
+            <LogOut size={16} />
+          </button>
+        </div>
         </div>
       </div>
     </header>

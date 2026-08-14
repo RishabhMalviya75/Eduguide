@@ -112,6 +112,7 @@ const FALLBACK_QUESTIONS = [
 
 export default function AptitudeTest() {
   const navigate = useNavigate();
+  const [hasStarted, setHasStarted] = useState(false);
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -160,7 +161,6 @@ export default function AptitudeTest() {
   }, [session, submitResult, submitting]);
 
   useEffect(() => {
-    startTest();
     return () => clearInterval(timerRef.current);
   }, []);
 
@@ -337,6 +337,31 @@ export default function AptitudeTest() {
     const s = (seconds % 60).toString().padStart(2, '0');
     return `${m}:${s}`;
   };
+
+  if (!hasStarted) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh', padding: '2rem' }}>
+        <div className="dash-card" style={{ padding: '3rem', maxWidth: '600px', textAlign: 'center' }}>
+          <Brain size={48} style={{ color: 'var(--brand-navy)', margin: '0 auto 1.5rem auto' }} />
+          <h2 style={{ fontSize: '1.8rem', color: '#0F172A', marginBottom: '1rem', fontWeight: 800 }}>Cognitive Assessment</h2>
+          <p style={{ color: '#64748B', fontSize: '1rem', marginBottom: '2rem', lineHeight: 1.6 }}>
+            This evaluation consists of logic, quantitative, and situational questions designed to map your Career Fit Zone. 
+            Ensure you are in a quiet environment. The timer will start immediately after clicking start.
+          </p>
+          <button 
+            className="btn-primary" 
+            style={{ fontSize: '1.1rem', padding: '0.8rem 2rem' }}
+            onClick={() => {
+              setHasStarted(true);
+              startTest();
+            }}
+          >
+            Start Assessment <ArrowRight size={18} />
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

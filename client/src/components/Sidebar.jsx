@@ -91,41 +91,6 @@ export default function Sidebar() {
         )}
       </nav>
 
-      {/* Footer Profile Snippet */}
-      <div className="sidebar-user-footer">
-        <div className="user-profile-pill">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-            <div className="user-avatar">
-              {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
-            </div>
-            <div className="user-details">
-              <div style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--slate-800)', lineHeight: 1.2 }}>
-                {user.name}
-              </div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--slate-500)' }}>
-                {role}
-              </div>
-            </div>
-          </div>
-          <button 
-            onClick={logout} 
-            title="Logout"
-            style={{ 
-              border: 'none', 
-              background: 'transparent', 
-              color: 'var(--slate-400)', 
-              cursor: 'pointer', 
-              padding: '0.25rem',
-              borderRadius: '6px',
-              transition: 'all 0.2s ease'
-            }}
-            onMouseOver={(e) => e.currentTarget.style.color = '#EF4444'}
-            onMouseOut={(e) => e.currentTarget.style.color = 'var(--slate-400)'}
-          >
-            <LogOut size={18} />
-          </button>
-        </div>
-      </div>
     </aside>
   );
 }
