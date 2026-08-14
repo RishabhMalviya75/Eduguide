@@ -21,7 +21,7 @@ import {
 import { Link } from 'react-router-dom';
 import { useState, useEffect, useMemo } from 'react';
 import { api } from '../../api/client';
-import { BarChart, Bar, Cell, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, Cell, XAxis, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import ConsentModal from '../../components/ConsentModal';
 import PISegmentCard from '../../components/PISegmentCard';
 
@@ -103,11 +103,11 @@ export default function StudentDashboard() {
           }
         ],
         aptitudeStats: {
-          'Logic': 0.72,
-          'Math': 0.45,
-          'Verbal': 0.62,
-          'Spatial': 0.85,
-          'Problem': 0.50
+          'Logic': 0.82,
+          'Math': 0.58,
+          'Verbal': 0.35,
+          'Spatial': 0.65,
+          'Problem': 0.88
         }
       });
       

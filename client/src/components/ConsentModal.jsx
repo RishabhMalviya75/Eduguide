@@ -43,22 +43,22 @@ export default function ConsentModal({ studentId, onConsentGranted }) {
       padding: '1rem'
     }}>
       <div style={{ 
-        maxWidth: '480px', 
+        maxWidth: '640px', 
         width: '100%', 
         background: '#FFFFFF', 
         borderRadius: '16px',
         boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
-        padding: '2rem',
+        padding: '1.5rem 2rem',
         border: '1px solid var(--slate-200)'
       }}>
-        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-          <ShieldCheck size={44} color="#0EA5E9" style={{ margin: '0 auto', strokeWidth: 2.5 }} />
-          <h2 style={{ color: '#0F172A', marginTop: '1rem', fontSize: '1.4rem', fontWeight: 800 }}>Data Privacy & Consent</h2>
+        <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+          <ShieldCheck size={40} color="#0EA5E9" style={{ margin: '0 auto', strokeWidth: 2.5 }} />
+          <h2 style={{ color: '#0F172A', marginTop: '0.75rem', fontSize: '1.3rem', fontWeight: 800 }}>Data Privacy & Consent</h2>
         </div>
         
-        <div style={{ color: '#475569', lineHeight: '1.7', marginBottom: '2.5rem', fontSize: '0.95rem' }}>
-          <p style={{ marginBottom: '1rem' }}>Welcome to EduGuide AI. To provide you with personalized career guidance, we need your consent to collect and process your data.</p>
-          <ul style={{ paddingLeft: '1.5rem', marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        <div style={{ color: '#475569', lineHeight: '1.5', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
+          <p style={{ marginBottom: '0.75rem' }}>Welcome to EduGuide AI. To provide you with personalized career guidance, we need your consent to collect and process your data.</p>
+          <ul style={{ paddingLeft: '1.5rem', marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <li><strong>AI Scoring:</strong> Your test responses, including essays, will be evaluated by our automated AI scoring pipeline.</li>
             <li><strong>Proctoring:</strong> We track your tab switches (focus loss) and IP address during tests to ensure academic integrity. (No camera/audio is recorded).</li>
             <li><strong>Career Mapping:</strong> Your counselor's Personal Interview (PI) notes and test scores are used to map you to relevant career paths.</li>
