@@ -148,11 +148,11 @@ export default function StudentLogin() {
         </div>
 
         {/* Header Banner */}
-        <div className="auth-header">
-          <div className="auth-icon-wrapper" style={{ background: 'linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%)' }}>
-            <GraduationCap size={32} />
+        <div className="auth-header" style={{ marginBottom: '1.25rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.75rem' }}>
+            <img src="/logo.png" alt="EduGuide Logo" style={{ width: '56px', height: '56px', objectFit: 'contain' }} />
           </div>
-          <h1 className="auth-title">Student Portal</h1>
+          <h1 className="auth-title" style={{ fontSize: '1.65rem' }}>Student Portal</h1>
           <p className="auth-subtitle">Access your Career Fit Zone & Assessment Reports</p>
           
           <div style={{ 

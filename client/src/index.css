@@ -1,37 +1,46 @@
 /* ==========================================================================
-   EduGuide AI — Neo-Glassmorphic Design System Tokens & Base Styles
+   EduGuide AI — Minimal Classic Design System Tokens & Base Styles
+   (Ocean Blue & Vibrant Indigo Palette derived from EduGuide Logo)
    ========================================================================== */
 
 :root {
   /* Core Base Colors */
   --bg-primary: #FFFFFF;
   --bg-secondary: #F8FAFC;
-  --bg-ambient: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 35%, #F0FDF4 70%, #F3E8FF 100%);
+  --bg-ambient: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 35%, #EFF6FF 70%, #F0F9FF 100%);
   
-  /* Primary Brand Accent (EduGreen / Emerald Teal) */
-  --brand-emerald: #10B981;
-  --brand-emerald-hover: #059669;
-  --brand-emerald-dark: #047857;
-  --brand-emerald-light: #ECFDF5;
-  --brand-emerald-border: rgba(16, 185, 129, 0.25);
-  --brand-emerald-glow: rgba(16, 185, 129, 0.15);
+  /* Primary Brand Accent (Ocean Blue / Royal Indigo) */
+  --brand-blue: #2563EB;
+  --brand-blue-hover: #1D4ED8;
+  --brand-blue-dark: #1E3A8A;
+  --brand-blue-light: #EFF6FF;
+  --brand-blue-border: rgba(37, 99, 235, 0.25);
+  --brand-blue-glow: rgba(37, 99, 235, 0.15);
+
+  /* Legacy Mapping for Smooth Compatibility */
+  --brand-emerald: #2563EB;
+  --brand-emerald-hover: #1D4ED8;
+  --brand-emerald-dark: #1E3A8A;
+  --brand-emerald-light: #EFF6FF;
+  --brand-emerald-border: rgba(37, 99, 235, 0.25);
+  --brand-emerald-glow: rgba(37, 99, 235, 0.15);
 
   /* Secondary Accent Colors */
-  --accent-violet: #A855F7;
-  --accent-violet-light: #FAF5FF;
-  --accent-violet-border: rgba(168, 85, 247, 0.25);
+  --accent-violet: #6366F1;
+  --accent-violet-light: #EEF2FF;
+  --accent-violet-border: rgba(99, 102, 241, 0.25);
 
-  --accent-orange: #F97316;
-  --accent-orange-light: #FFF7ED;
-  --accent-orange-border: rgba(249, 115, 22, 0.25);
+  --accent-amber: #D97706;
+  --accent-amber-light: #FFFBEB;
+  --accent-amber-border: rgba(217, 119, 6, 0.25);
 
-  --accent-sky: #0EA5E9;
-  --accent-sky-light: #F0F9FF;
-  --accent-sky-border: rgba(14, 165, 233, 0.25);
+  --accent-sky: #0284C7;
+  --accent-sky-light: #E0F2FE;
+  --accent-sky-border: rgba(2, 132, 199, 0.25);
 
-  --accent-yellow: #EAB308;
-  --accent-yellow-light: #FEFCE8;
-  --accent-yellow-border: rgba(234, 179, 8, 0.25);
+  --accent-indigo: #4F46E5;
+  --accent-indigo-light: #EEF2FF;
+  --accent-indigo-border: rgba(79, 70, 229, 0.25);
 
   /* Neutrals & Slate */
   --slate-900: #0F172A;
@@ -46,12 +55,12 @@
   --slate-50:  #F8FAFC;
 
   /* Glassmorphism Tokens */
-  --glass-bg: rgba(255, 255, 255, 0.75);
-  --glass-bg-dense: rgba(255, 255, 255, 0.90);
-  --glass-border: 1px solid rgba(226, 232, 240, 0.7);
-  --glass-border-subtle: 1px solid rgba(0, 0, 0, 0.05);
-  --glass-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.04), 0 4px 12px -2px rgba(0, 0, 0, 0.02);
-  --glass-shadow-hover: 0 20px 40px -10px rgba(16, 185, 129, 0.12), 0 8px 16px -4px rgba(0, 0, 0, 0.04);
+  --glass-bg: rgba(255, 255, 255, 0.82);
+  --glass-bg-dense: rgba(255, 255, 255, 0.92);
+  --glass-border: 1px solid rgba(226, 232, 240, 0.8);
+  --glass-border-subtle: 1px solid rgba(37, 99, 235, 0.08);
+  --glass-shadow: 0 10px 30px -5px rgba(37, 99, 235, 0.05), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
+  --glass-shadow-hover: 0 20px 40px -10px rgba(37, 99, 235, 0.15), 0 8px 16px -4px rgba(15, 23, 42, 0.05);
   --glass-blur: blur(16px) saturate(180%);
 
   /* Border Radii */
@@ -141,13 +150,13 @@ button, input, select, textarea {
   background: #FFFFFF;
   border: var(--glass-border-subtle);
   border-radius: var(--radius-md);
-  box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.03);
+  box-shadow: 0 4px 14px 0 rgba(15, 23, 42, 0.03);
   transition: all 0.2s ease-in-out;
 }
 
 .glass-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.1);
 }
 
 /* Badge Utilities */
@@ -163,34 +172,28 @@ button, input, select, textarea {
   line-height: 1;
 }
 
-.badge-emerald {
-  background: var(--brand-emerald-light);
-  color: var(--brand-emerald-dark);
-  border: 1px solid var(--brand-emerald-border);
+.badge-emerald, .badge-blue {
+  background: var(--brand-blue-light);
+  color: var(--brand-blue-dark);
+  border: 1px solid var(--brand-blue-border);
 }
 
 .badge-violet {
   background: var(--accent-violet-light);
-  color: #7E22CE;
+  color: #4338CA;
   border: 1px solid var(--accent-violet-border);
 }
 
-.badge-orange {
-  background: var(--accent-orange-light);
-  color: #C2410C;
-  border: 1px solid var(--accent-orange-border);
+.badge-orange, .badge-amber {
+  background: var(--accent-amber-light);
+  color: #B45309;
+  border: 1px solid var(--accent-amber-border);
 }
 
 .badge-sky {
   background: var(--accent-sky-light);
   color: #0369A1;
   border: 1px solid var(--accent-sky-border);
-}
-
-.badge-yellow {
-  background: var(--accent-yellow-light);
-  color: #854D0E;
-  border: 1px solid var(--accent-yellow-border);
 }
 
 .badge-slate {
@@ -205,7 +208,7 @@ button, input, select, textarea {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: linear-gradient(135deg, var(--brand-emerald) 0%, var(--brand-emerald-hover) 100%);
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
   color: #FFFFFF;
   font-weight: 600;
   font-size: 0.9rem;
@@ -213,14 +216,14 @@ button, input, select, textarea {
   border-radius: var(--radius-md);
   border: none;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28);
   transition: all 0.2s ease-in-out;
 }
 
 .btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35);
-  background: linear-gradient(135deg, #10B981 0%, #047857 100%);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.38);
+  background: linear-gradient(135deg, #1D4ED8 0%, #1E3A8A 100%);
 }
 
 .btn-primary:active {
@@ -264,8 +267,8 @@ button, input, select, textarea {
 }
 
 .form-input:focus {
-  border-color: var(--brand-emerald);
-  box-shadow: 0 0 0 3px var(--brand-emerald-glow);
+  border-color: var(--brand-blue);
+  box-shadow: 0 0 0 3px var(--brand-blue-glow);
 }
 
 .form-input::placeholder {
