@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Briefcase, LogIn, AlertCircle, ArrowLeft } from 'lucide-react';
+import { Briefcase, LogIn, AlertCircle, ArrowLeft, KeyRound } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import '../../styles/auth.css';
 
@@ -22,7 +22,7 @@ export default function StaffLogin() {
 
     if (result.success) {
       if (result.user.role === 'Admin') navigate('/admin');
-      else navigate('/teacher'); // Teacher and Counselor both go to unified staff dashboard
+      else navigate('/teacher'); // Unified staff portal
     } else {
       setError(result.error);
       setLoading(false);
@@ -33,23 +33,38 @@ export default function StaffLogin() {
     <div className="auth-layout">
       <div className="auth-card">
         <div style={{ textAlign: 'left', marginBottom: '1rem' }}>
-          <Link to="/" style={{ color: 'var(--slate-500)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.9rem' }}>
-            <ArrowLeft size={16} /> Back
+          <Link to="/" style={{ color: 'var(--slate-500)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.88rem', fontWeight: 500 }}>
+            <ArrowLeft size={16} /> Back to Portal Selection
           </Link>
         </div>
         
         <div className="auth-header">
-          <Briefcase size={40} className="auth-icon" />
-          <h1 className="auth-title">Staff Portal</h1>
-          <p className="auth-subtitle">Sign in to manage classes and students</p>
+          <div className="auth-icon-wrapper" style={{ background: 'linear-gradient(135deg, #A855F7 0%, #7E22CE 100%)', boxShadow: '0 10px 25px rgba(168, 85, 247, 0.25)' }}>
+            <Briefcase size={32} />
+          </div>
+          <h1 className="auth-title">Staff Workspace</h1>
+          <p className="auth-subtitle">Sign in as Admin, Teacher, or Counselor</p>
           
-          <div style={{ marginTop: '1rem', padding: '1rem', background: 'var(--sky-50)', borderRadius: '8px', border: '1px solid var(--sky-200)', fontSize: '0.85rem', color: 'var(--slate-700)', textAlign: 'left' }}>
-            <strong>Testing Credentials:</strong>
-            <ul style={{ margin: '0.5rem 0 0 0', paddingLeft: '1.2rem', lineHeight: '1.6' }}>
-              <li><strong>Admin:</strong> admin@dps001.edu <br/> <span style={{color: 'var(--slate-500)'}}>Pass: admin123</span></li>
-              <li><strong>Teacher:</strong> rahul.verma@dps001.edu <br/> <span style={{color: 'var(--slate-500)'}}>Pass: teacher123</span></li>
-              <li><strong>Counselor:</strong> neha.gupta@dps001.edu <br/> <span style={{color: 'var(--slate-500)'}}>Pass: counselor123</span></li>
-            </ul>
+          {/* Quick Credential Hint Box */}
+          <div style={{ 
+            marginTop: '1.25rem', 
+            padding: '1rem', 
+            background: 'var(--slate-50)', 
+            borderRadius: 'var(--radius-md)', 
+            border: '1px solid var(--slate-200)', 
+            fontSize: '0.82rem', 
+            color: 'var(--slate-700)', 
+            textAlign: 'left' 
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 700, color: 'var(--slate-900)', marginBottom: '0.4rem' }}>
+              <KeyRound size={14} color="var(--brand-emerald)" />
+              <span>Development Test Credentials:</span>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.3rem', fontSize: '0.8rem' }}>
+              <div><strong>Admin:</strong> <code>admin@dps001.edu</code> (pass: <code>admin123</code>)</div>
+              <div><strong>Teacher:</strong> <code>rahul.verma@dps001.edu</code> (pass: <code>teacher123</code>)</div>
+              <div><strong>Counselor:</strong> <code>neha.gupta@dps001.edu</code> (pass: <code>counselor123</code>)</div>
+            </div>
           </div>
         </div>
 
@@ -67,7 +82,7 @@ export default function StaffLogin() {
               type="email" 
               id="email" 
               className="form-input" 
-              placeholder="e.g., admin@school.edu"
+              placeholder="e.g., admin@dps001.edu"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required 
@@ -87,9 +102,9 @@ export default function StaffLogin() {
             />
           </div>
 
-          <button type="submit" className="btn-primary" disabled={loading}>
+          <button type="submit" className="btn-primary" disabled={loading} style={{ width: '100%', marginTop: '0.5rem' }}>
             {loading ? 'Signing in...' : (
-              <>Sign In <LogIn size={18} /></>
+              <>Sign In to Workspace <LogIn size={18} /></>
             )}
           </button>
         </form>

@@ -22,5 +22,6 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Coverage
-coverage/
+# Database data
+db_data/
+server/db_data/
