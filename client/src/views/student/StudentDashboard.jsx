@@ -21,7 +21,7 @@ import {
 import { Link } from 'react-router-dom';
 import { useState, useEffect, useMemo } from 'react';
 import { api } from '../../api/client';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, Cell, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import ConsentModal from '../../components/ConsentModal';
 import PISegmentCard from '../../components/PISegmentCard';
 
@@ -259,22 +259,17 @@ export default function StudentDashboard() {
           <div style={{ height: '280px', width: '100%', marginTop: '1rem' }}>
             {barData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={barData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#0F172A" stopOpacity={0.2}/>
-                      <stop offset="95%" stopColor="#0F172A" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
-                  <XAxis dataKey="subject" axisLine={false} tickLine={false} tick={{ fill: '#94A3B8', fontSize: 12 }} dy={10} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94A3B8', fontSize: 12 }} />
+                <BarChart data={barData} margin={{ top: 0, right: 0, left: 0, bottom: 0 }} barCategoryGap="20%">
                   <RechartsTooltip 
-                    cursor={{ stroke: '#F8FAFC', strokeWidth: 2 }}
+                    cursor={{ fill: 'transparent' }}
                     contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
                   />
-                  <Area type="monotone" dataKey="score" stroke="#0F172A" strokeWidth={3} fillOpacity={1} fill="url(#colorScore)" />
-                </AreaChart>
+                  <Bar dataKey="score" radius={[8, 8, 0, 0]}>
+                    {barData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={index === 1 || index === 3 ? '#0A2540' : '#E6E8FA'} />
+                    ))}
+                  </Bar>
+                </BarChart>
               </ResponsiveContainer>
             ) : (
                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#94A3B8' }}>
