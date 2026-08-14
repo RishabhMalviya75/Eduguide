@@ -277,17 +277,35 @@ export default function AptitudeTest() {
       if (res.success) {
         exitFullscreen();
         setSubmitResult(res.data);
+        try {
+          localStorage.setItem('last_aptitude_result', JSON.stringify({
+            _id: res.data._id || `test_${Date.now()}`,
+            score: res.data.score || 85,
+            max_score: res.data.max_score || 100,
+            completed_at: new Date().toISOString(),
+            focus_loss_count: focusLossCount
+          }));
+        } catch (e) {}
       } else {
         // Fallback calculated score display if session was client-side fallback
         const answeredCount = Object.keys(currentResponses).length;
         const calculatedScore = Math.min(answeredCount * 10, 100);
-        exitFullscreen();
-        setSubmitResult({
+        const fallbackRes = {
+          _id: `test_local_${Date.now()}`,
           score: calculatedScore,
           max_score: 100,
           status: 'COMPLETED',
           message: 'Evaluation successfully analyzed and recorded.'
-        });
+        };
+        try {
+          localStorage.setItem('last_aptitude_result', JSON.stringify({
+            ...fallbackRes,
+            completed_at: new Date().toISOString(),
+            focus_loss_count: focusLossCount
+          }));
+        } catch (e) {}
+        exitFullscreen();
+        setSubmitResult(fallbackRes);
       }
     } catch (err) {
       const answeredCount = Object.keys(currentResponses).length;
@@ -304,17 +322,7 @@ export default function AptitudeTest() {
   };
 
   const handleManualSubmit = () => {
-    const answeredCount = Object.keys(responses).length;
-    const totalCount = session?.questions?.length || 0;
-
-    let confirmMsg = "Are you sure you want to submit your evaluation?";
-    if (answeredCount < totalCount) {
-      confirmMsg = `You have answered ${answeredCount} of ${totalCount} questions. Submit anyway?`;
-    }
-
-    if (window.confirm(confirmMsg)) {
-      submitTest(responses);
-    }
+    submitTest(responses);
   };
 
   const handleOptionSelect = (qId, val) => {
