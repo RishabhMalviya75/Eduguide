@@ -25,9 +25,7 @@ export default function Sidebar() {
     <aside className="app-sidebar">
       {/* Branded Header Logo */}
       <div className="sidebar-logo">
-        <div className="sidebar-logo-icon">
-          <Sparkles size={22} />
-        </div>
+        <img src="/logo.png" alt="EduGuide Logo" style={{ width: '64px', height: '64px', objectFit: 'contain' }} />
         <div>
           <div className="sidebar-logo-text">EduGuide <span className="sidebar-logo-tag">AI</span></div>
         </div>
@@ -48,7 +46,11 @@ export default function Sidebar() {
               <Award size={20} />
               <span>Aptitude Test</span>
             </NavLink>
-            <NavLink to={`/student/report/${user.id}`} className={({ isActive }) => `sidebar-nav-item ${isActive ? 'active' : ''}`}>
+            <NavLink to="/student/profile" className={({ isActive }) => `sidebar-nav-item ${isActive ? 'active' : ''}`}>
+              <Users size={20} />
+              <span>My Profile</span>
+            </NavLink>
+            <NavLink to={`/student/report/${user.id || user._id}`} className={({ isActive }) => `sidebar-nav-item ${isActive ? 'active' : ''}`}>
               <BarChart3 size={20} />
               <span>Career Report</span>
             </NavLink>

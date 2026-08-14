@@ -1,8 +1,8 @@
 import { useAuth } from '../context/AuthContext';
-import { Search, Bell, School, Shield, Sparkles } from 'lucide-react';
+import { Search, Bell, School, Shield, Sparkles, LogOut } from 'lucide-react';
 
 export default function Header() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   if (!user) return null;
 
