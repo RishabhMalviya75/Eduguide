@@ -7,8 +7,9 @@ const config = require('./index');
  */
 async function connectDB() {
   try {
+    mongoose.set('bufferCommands', false);
     await mongoose.connect(config.mongoUri, {
-      // Mongoose 8 uses the new URL parser and unified topology by default
+      serverSelectionTimeoutMS: 2000,
     });
 
     console.log(`[DB] Connected to MongoDB: ${mongoose.connection.host}`);

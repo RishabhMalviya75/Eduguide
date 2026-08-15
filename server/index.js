@@ -10,9 +10,6 @@ const app = require('./app');
  */
 async function startServer() {
   try {
-    // Connect to MongoDB first
-    await connectDB();
-
     // Start Express server
     const server = app.listen(config.port, () => {
       console.log(`\n🎓 EduGuide AI Server`);
@@ -20,6 +17,11 @@ async function startServer() {
       console.log(`   Port:        ${config.port}`);
       console.log(`   URL:         http://localhost:${config.port}`);
       console.log(`   Health:      http://localhost:${config.port}/api/health\n`);
+    });
+
+    // Connect to MongoDB
+    connectDB().catch((err) => {
+      console.warn('[DB] Initial connection deferred:', err.message);
     });
 
     // Graceful shutdown

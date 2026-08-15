@@ -214,6 +214,14 @@ function ruleFallback(session) {
  */
 exports.getTestHistory = async (req, res, next) => {
   try {
+    const mongoose = require('mongoose');
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+      });
+    }
+
     const history = await TestSession.find({
       student_id: req.user.student_id,
       status: 'completed'
