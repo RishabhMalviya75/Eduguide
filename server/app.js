@@ -15,6 +15,7 @@ const testRoutes = require('./routes/testRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
 const scoreRoutes = require('./routes/scoreRoutes');
 const piRoutes = require('./routes/piRoutes');
+const activityRoutes = require('./routes/activityRoutes');
 
 const app = express();
 
@@ -58,6 +59,8 @@ app.use('/api/tests', testRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/scores', scoreRoutes);
 app.use('/api/pi', piRoutes);
+app.use('/api/activities', activityRoutes);
+
 
 // --- Error Handling ---
 app.use(notFound);

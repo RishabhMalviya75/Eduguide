@@ -42,6 +42,10 @@ export default function Sidebar() {
               <LayoutDashboard size={20} />
               <span>My Portal</span>
             </NavLink>
+            <NavLink to="/activities" className={({ isActive }) => `sidebar-nav-item ${isActive ? 'active' : ''}`}>
+              <Sparkles size={20} />
+              <span>Activity Hub</span>
+            </NavLink>
             <NavLink to="/student/test" className={({ isActive }) => `sidebar-nav-item ${isActive ? 'active' : ''}`}>
               <Award size={20} />
               <span>Aptitude Test</span>
@@ -64,6 +68,10 @@ export default function Sidebar() {
               <LayoutDashboard size={20} />
               <span>Class Overview</span>
             </NavLink>
+            <NavLink to="/activities" className={({ isActive }) => `sidebar-nav-item ${isActive ? 'active' : ''}`}>
+              <Sparkles size={20} />
+              <span>Activity Hub</span>
+            </NavLink>
             <NavLink to="/teacher/upload" className={({ isActive }) => `sidebar-nav-item ${isActive ? 'active' : ''}`}>
               <BookOpen size={20} />
               <span>Upload Marks</span>
@@ -78,6 +86,7 @@ export default function Sidebar() {
             </NavLink>
           </>
         )}
+
 
         {/* Admin Links */}
         {role === 'Admin' && (
