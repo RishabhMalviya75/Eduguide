@@ -12,7 +12,8 @@ import {
   UserCheck,
   Award,
   BookOpen,
-  GraduationCap
+  GraduationCap,
+  Edit3
 } from 'lucide-react';
 
 const CATEGORY_STYLES = {
@@ -187,13 +188,25 @@ export default function ActivityCard({
         )}
 
         {(userRole === 'Teacher' || userRole === 'Admin') && (
-          <button 
-            className="btn-card-primary btn-join"
-            onClick={() => onViewParticipants(activity)}
-          >
-            <UserCheck size={15} />
-            Roster ({currentParticipantsCount})
-          </button>
+          <>
+            {onEdit && (
+              <button 
+                className="btn-card-primary btn-details"
+                onClick={() => onEdit(activity)}
+                title="Edit Activity Details"
+              >
+                <Edit3 size={15} />
+                Edit
+              </button>
+            )}
+            <button 
+              className="btn-card-primary btn-join"
+              onClick={() => onViewParticipants(activity)}
+            >
+              <UserCheck size={15} />
+              Roster ({currentParticipantsCount})
+            </button>
+          </>
         )}
       </div>
     </div>

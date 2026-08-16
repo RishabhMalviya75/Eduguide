@@ -272,12 +272,9 @@ async function updateActivity(req, res) {
     throw new ApiError(404, 'Activity not found');
   }
 
-  // Authorization check: Admin or creator Teacher
-  if (
-    req.user.role !== 'Admin' &&
-    activity.organizer.user_id.toString() !== (req.user.user_id || req.user.id).toString()
-  ) {
-    throw new ApiError(403, 'Access denied. You can only update activities you created.');
+  // Authorization check: Teacher or Admin
+  if (req.user.role !== 'Admin' && req.user.role !== 'Teacher') {
+    throw new ApiError(403, 'Access denied. Only teachers and admins can edit activities.');
   }
 
   const {
@@ -340,11 +337,8 @@ async function cancelActivity(req, res) {
     throw new ApiError(404, 'Activity not found');
   }
 
-  if (
-    req.user.role !== 'Admin' &&
-    activity.organizer.user_id.toString() !== (req.user.user_id || req.user.id).toString()
-  ) {
-    throw new ApiError(403, 'Access denied. You can only cancel activities you created.');
+  if (req.user.role !== 'Admin' && req.user.role !== 'Teacher') {
+    throw new ApiError(403, 'Access denied. Only teachers and admins can cancel activities.');
   }
 
   activity.status = 'cancelled';
@@ -497,11 +491,8 @@ async function getActivityParticipants(req, res) {
     throw new ApiError(404, 'Activity not found');
   }
 
-  if (
-    req.user.role !== 'Admin' &&
-    activity.organizer.user_id.toString() !== (req.user.user_id || req.user.id).toString()
-  ) {
-    throw new ApiError(403, 'Access denied. You can only view participants for activities you manage.');
+  if (req.user.role !== 'Admin' && req.user.role !== 'Teacher') {
+    throw new ApiError(403, 'Access denied. Only teachers and admins can view activity participants.');
   }
 
   const registrations = await ActivityRegistration.find({

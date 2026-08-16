@@ -51,6 +51,8 @@ export default function ActivityHubView() {
   const [participantsActivity, setParticipantsActivity] = useState(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isSubmittingCreate, setIsSubmittingCreate] = useState(false);
+  const [editActivity, setEditActivity] = useState(null);
+  const [isSubmittingEdit, setIsSubmittingEdit] = useState(false);
 
   useEffect(() => {
     fetchActivities();
@@ -135,6 +137,21 @@ export default function ActivityHubView() {
       showToast(`⚠️ ${err.message || 'Failed to create activity'}`);
     } finally {
       setIsSubmittingCreate(false);
+    }
+  };
+
+  const handleEditSubmit = async (formData) => {
+    if (!editActivity) return;
+    try {
+      setIsSubmittingEdit(true);
+      await api.put(`/activities/${editActivity._id}`, formData);
+      setEditActivity(null);
+      showToast('✨ Activity details updated successfully!');
+      fetchActivities();
+    } catch (err) {
+      showToast(`⚠️ ${err.message || 'Failed to update activity'}`);
+    } finally {
+      setIsSubmittingEdit(false);
     }
   };
 
@@ -330,6 +347,7 @@ export default function ActivityHubView() {
               onRegister={handleRegister}
               onUnregister={handleUnregister}
               onViewParticipants={(activity) => setParticipantsActivity(activity)}
+              onEdit={(activity) => setEditActivity(activity)}
             />
           ))}
         </div>
@@ -347,6 +365,7 @@ export default function ActivityHubView() {
             setDetailActivity(null);
             setParticipantsActivity(activity);
           }}
+          onEdit={(activity) => setEditActivity(activity)}
         />
       )}
 
@@ -365,6 +384,17 @@ export default function ActivityHubView() {
           onClose={() => setIsCreateOpen(false)}
           onSubmit={handleCreateSubmit}
           isSubmitting={isSubmittingCreate}
+        />
+      )}
+
+      {/* Edit Activity Form Modal (Teacher/Admin) */}
+      {editActivity && (
+        <CreateActivityModal
+          isOpen={Boolean(editActivity)}
+          initialData={editActivity}
+          onClose={() => setEditActivity(null)}
+          onSubmit={handleEditSubmit}
+          isSubmitting={isSubmittingEdit}
         />
       )}
     </div>

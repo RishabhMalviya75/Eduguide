@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { X, Plus, Sparkles } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Plus, Sparkles, Edit3 } from 'lucide-react';
 
 const CATEGORIES = [
   'Cultural & Performing Arts',
@@ -11,8 +11,10 @@ const CATEGORIES = [
 
 const GRADES = [6, 7, 8, 9, 10, 11, 12];
 
-export default function CreateActivityModal({ isOpen, onClose, onSubmit, isSubmitting }) {
+export default function CreateActivityModal({ isOpen, onClose, onSubmit, isSubmitting, initialData }) {
   if (!isOpen) return null;
+
+  const isEdit = Boolean(initialData);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -26,9 +28,65 @@ export default function CreateActivityModal({ isOpen, onClose, onSubmit, isSubmi
     maxParticipants: '',
     registrationDeadline: '',
     registrationDetails: '',
+    status: 'active',
   });
 
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (initialData) {
+      let formattedDate = '';
+      if (initialData.date) {
+        const d = new Date(initialData.date);
+        if (!isNaN(d.getTime())) {
+          formattedDate = d.toISOString().split('T')[0];
+        }
+      }
+
+      let formattedDeadline = '';
+      if (initialData.registrationDeadline) {
+        const d = new Date(initialData.registrationDeadline);
+        if (!isNaN(d.getTime())) {
+          const year = d.getFullYear();
+          const month = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          const hours = String(d.getHours()).padStart(2, '0');
+          const minutes = String(d.getMinutes()).padStart(2, '0');
+          formattedDeadline = `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+      }
+
+      setFormData({
+        title: initialData.title || '',
+        category: initialData.category || CATEGORIES[0],
+        description: initialData.description || '',
+        date: formattedDate,
+        time: initialData.time || '',
+        location: initialData.location || '',
+        eligibilityGrades: initialData.eligibility?.grades || [6, 7, 8, 9, 10, 11, 12],
+        eligibilityText: initialData.eligibility?.text || 'Classes 6 to 12',
+        maxParticipants: initialData.maxParticipants || '',
+        registrationDeadline: formattedDeadline,
+        registrationDetails: initialData.registrationDetails || '',
+        status: initialData.status || 'active',
+      });
+    } else {
+      setFormData({
+        title: '',
+        category: CATEGORIES[0],
+        description: '',
+        date: '',
+        time: '10:00 AM - 01:00 PM',
+        location: '',
+        eligibilityGrades: [6, 7, 8, 9, 10, 11, 12],
+        eligibilityText: 'Classes 6 to 12',
+        maxParticipants: '',
+        registrationDeadline: '',
+        registrationDetails: '',
+        status: 'active',
+      });
+    }
+  }, [initialData, isOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -72,8 +130,12 @@ export default function CreateActivityModal({ isOpen, onClose, onSubmit, isSubmi
       <div className="modal-content-box" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '640px' }}>
         <div className="modal-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Sparkles size={20} style={{ color: 'var(--brand-blue)' }} />
-            <h2 className="modal-title">Create New Activity</h2>
+            {isEdit ? (
+              <Edit3 size={20} style={{ color: 'var(--brand-blue)' }} />
+            ) : (
+              <Sparkles size={20} style={{ color: 'var(--brand-blue)' }} />
+            )}
+            <h2 className="modal-title">{isEdit ? 'Edit Activity Details' : 'Create New Activity'}</h2>
           </div>
           <button className="modal-close-btn" onClick={onClose}>
             <X size={20} />
@@ -203,6 +265,22 @@ export default function CreateActivityModal({ isOpen, onClose, onSubmit, isSubmi
               </div>
             </div>
 
+            {/* Status (Edit mode only) */}
+            {isEdit && (
+              <div>
+                <label className="filter-label" style={{ marginBottom: '0.35rem', display: 'block' }}>Activity Status</label>
+                <select
+                  name="status"
+                  className="filter-control"
+                  value={formData.status}
+                  onChange={handleChange}
+                >
+                  <option value="active">Active (Open/Published)</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+            )}
+
             {/* Grade Eligibility Selection */}
             <div>
               <label className="filter-label" style={{ marginBottom: '0.5rem', display: 'block' }}>Eligible Class Grades *</label>
@@ -252,7 +330,9 @@ export default function CreateActivityModal({ isOpen, onClose, onSubmit, isSubmi
               Cancel
             </button>
             <button type="submit" className="btn-create-activity" disabled={isSubmitting}>
-              {isSubmitting ? 'Creating...' : 'Create Activity'}
+              {isSubmitting
+                ? isEdit ? 'Saving Changes...' : 'Creating...'
+                : isEdit ? 'Save Changes' : 'Create Activity'}
             </button>
           </div>
         </form>
@@ -260,3 +340,4 @@ export default function CreateActivityModal({ isOpen, onClose, onSubmit, isSubmi
     </div>
   );
 }
+

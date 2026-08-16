@@ -11,7 +11,8 @@ import {
   Mail, 
   FileText, 
   Sparkles,
-  UserPlus
+  UserPlus,
+  Edit3
 } from 'lucide-react';
 
 export default function ActivityDetailModal({ 
@@ -20,7 +21,8 @@ export default function ActivityDetailModal({
   onClose, 
   onRegister, 
   onUnregister,
-  onViewParticipants
+  onViewParticipants,
+  onEdit
 }) {
   if (!activity) return null;
 
@@ -220,15 +222,30 @@ export default function ActivityDetailModal({
           )}
 
           {(userRole === 'Teacher' || userRole === 'Admin') && (
-            <button 
-              className="btn-card-primary btn-join"
-              onClick={() => {
-                onClose();
-                onViewParticipants(activity);
-              }}
-            >
-              View Participant Roster ({currentParticipantsCount})
-            </button>
+            <>
+              {onEdit && (
+                <button
+                  className="btn-card-primary btn-details"
+                  style={{ border: '1px solid var(--brand-blue)', color: 'var(--brand-blue)', background: '#F0F7FF' }}
+                  onClick={() => {
+                    onClose();
+                    onEdit(activity);
+                  }}
+                >
+                  <Edit3 size={16} />
+                  Edit Activity Details
+                </button>
+              )}
+              <button 
+                className="btn-card-primary btn-join"
+                onClick={() => {
+                  onClose();
+                  onViewParticipants(activity);
+                }}
+              >
+                View Participant Roster ({currentParticipantsCount})
+              </button>
+            </>
           )}
         </div>
       </div>
