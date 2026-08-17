@@ -15,12 +15,25 @@ import AptitudeTest from './views/student/AptitudeTest';
 import StudentProfile from './views/student/StudentProfile';
 import ReviewQueue from './views/staff/ReviewQueue';
 import CounselorDashboard from './views/counselor/CounselorDashboard';
+import ActivityHubView from './views/activities/ActivityHubView';
 
 export default function AppRoutes() {
   const { user } = useAuth();
 
   return (
     <Routes>
+      {/* Extracurricular Activity Hub (All Roles) */}
+      <Route 
+        path="/activities" 
+        element={
+          <ProtectedRoute allowedRoles={['Student', 'Teacher', 'Counselor', 'Admin']}>
+            <AppLayout>
+              <ActivityHubView />
+            </AppLayout>
+          </ProtectedRoute>
+        } 
+      />
+
       {/* Public Unauthenticated Routes */}
       <Route 
         path="/" 
